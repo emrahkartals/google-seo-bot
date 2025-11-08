@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google SEO Bot</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 data-i18n="app.title">🚀 Google SEO Bot</h1>
+                <p class="subtitle" data-i18n="app.subtitle">Organik trafik simülasyonu ile SEO sıralamanızı yükseltin</p>
+            </div>
+            <div class="header-right">
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="tr">🇹🇷 Türkçe</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="ru">🇷🇺 Русский</option>
+                        <option value="ja">🇯🇵 日本語</option>
+                        <option value="ko">🇰🇷 한국어</option>
+                    </select>
+                </div>
+                <div class="status-indicator">
+                    <span id="status-dot" class="status-dot"></span>
+                    <span id="status-text" data-i18n="status.ready">Hazır</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Configuration -->
+            <div class="config-panel">
+                <h2 data-i18n="settings.title">⚙️ Ayarlar</h2>
+                
+                <div class="form-group">
+                    <label for="url" data-i18n="settings.url">Site URL'i *</label>
+                    <input type="url" id="url" placeholder="https://example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="visitor-count" data-i18n="settings.visitorCount">Ziyaretçi Sayısı</label>
+                    <input type="number" id="visitor-count" value="10" min="1" max="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="distribution-type" data-i18n="settings.distributionType">Dağılım Tipi</label>
+                    <select id="distribution-type">
+                        <option value="hourly" data-i18n="settings.hourly">Saatlik</option>
+                        <option value="daily" data-i18n="settings.daily">Günlük</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-visitor-rate" data-i18n="settings.newVisitorRate">Yeni Ziyaretçi Oranı (%)</label>
+                    <input type="number" id="new-visitor-rate" value="70" min="0" max="100">
+                    <small data-i18n="settings.newVisitorRateDesc">Yeni ziyaretçiler arama motorundan gelecek</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="search-keywords" data-i18n="settings.searchKeywords">Arama Terimleri (virgülle ayırın)</label>
+                    <textarea id="search-keywords" rows="3" data-i18n-placeholder="settings.searchKeywordsPlaceholder" placeholder="örnek keyword, başka keyword"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="search-engine" data-i18n="settings.searchEngine">Arama Motoru</label>
+                    <select id="search-engine">
+                        <option value="google" data-i18n="searchEngines.google">Google</option>
+                        <option value="bing" data-i18n="searchEngines.bing">Bing</option>
+                        <option value="yahoo" data-i18n="searchEngines.yahoo">Yahoo</option>
+                        <option value="duckduckgo" data-i18n="searchEngines.duckduckgo">DuckDuckGo</option>
+                        <option value="yandex" data-i18n="searchEngines.yandex">Yandex</option>
+                        <option value="direct" data-i18n="searchEngines.direct">Direkt Git</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start-time" data-i18n="settings.startTime">Başlangıç Zamanı</label>
+                        <input type="datetime-local" id="start-time">
+                    </div>
+                    <div class="form-group">
+                        <label for="end-time" data-i18n="settings.endTime">Bitiş Zamanı</label>
+                        <input type="datetime-local" id="end-time">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="page-min-time" data-i18n="settings.pageMinTime">Sayfa Min Süre (sn)</label>
+                        <input type="number" id="page-min-time" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="page-max-time" data-i18n="settings.pageMaxTime">Sayfa Max Süre (sn)</label>
+                        <input type="number" id="page-max-time" value="30" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="total-min-time" data-i18n="settings.totalMinTime">Toplam Min Süre (dk)</label>
+                        <input type="number" id="total-min-time" value="2" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="total-max-time" data-i18n="settings.totalMaxTime">Toplam Max Süre (dk)</label>
+                        <input type="number" id="total-max-time" value="5" min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="page-count" data-i18n="settings.pageCount">Gezilecek Sayfa Sayısı</label>
+                    <input type="number" id="page-count" value="10" min="1" max="100">
+                </div>
+
+                <div class="button-group">
+                    <button id="check-sitemap-btn" class="btn btn-secondary" data-i18n="buttons.checkSitemap">Sitemap Kontrol Et</button>
+                    <button id="start-btn" class="btn btn-primary" data-i18n="buttons.start">Başlat</button>
+                    <button id="stop-btn" class="btn btn-danger" disabled data-i18n="buttons.stop">Durdur</button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Logs and Charts -->
+            <div class="right-panel">
+                <!-- Chart Panel -->
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <h2 data-i18n="chart.title">📈 Ziyaret Grafiği</h2>
+                        <div class="chart-controls">
+                            <button id="chart-type-btn" class="btn-small" data-i18n="buttons.line">Çizgi</button>
+                            <button id="reset-chart-btn" class="btn-small" data-i18n="buttons.reset">Sıfırla</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="visits-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Logs Panel -->
+                <div class="logs-panel">
+                    <div class="logs-header">
+                        <h2 data-i18n="logs.title">📊 Loglar</h2>
+                        <button id="clear-logs-btn" class="btn-small" data-i18n="buttons.clear">Temizle</button>
+                    </div>
+                    <div id="logs-container" class="logs-container">
+                        <div class="log-placeholder" data-i18n="logs.placeholder">Loglar burada görünecek...</div>
+                    </div>
+                    <div class="stats-panel">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="stats.totalVisits">Toplam Ziyaret:</span>
+                            <span id="total-visits" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="stats.lastVisit">Son Ziyaret:</span>
+                            <span id="last-visit" class="stat-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+

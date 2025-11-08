@@ -1,0 +1,24 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+// Güvenli API'yi expose et
+contextBridge.exposeInMainWorld('electronAPI', {
+    // Bot kontrolü
+    startBot: (config) => ipcRenderer.invoke('start-bot', config),
+    stopBot: () => ipcRenderer.invoke('stop-bot'),
+    checkSitemap: (url) => ipcRenderer.invoke('check-sitemap', url),
+    getBotStatus: () => ipcRenderer.invoke('get-bot-status'),
+    
+    // Event listeners
+    onLogMessage: (callback) => {
+        ipcRenderer.on('log-message', (event, message) => callback(message));
+    },
+    onVisitRecorded: (callback) => {
+        ipcRenderer.on('visit-recorded', (event, visit) => callback(visit));
+    },
+    
+    // Cleanup
+    removeAllListeners: (channel) => {
+        ipcRenderer.removeAllListeners(channel);
+    }
+});
+
