@@ -35,12 +35,8 @@
     "appId": "com.google.seo.bot",
     "productName": "Google SEO Bot",
     "win": {
-      "target": "nsis",
+      "target": "dir",
       "icon": "build/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
     }
   }
 }

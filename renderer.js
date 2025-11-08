@@ -89,6 +89,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Electron API listeners
     if (window.electronAPI) {
+        // Menü komutlarını dinle
+        window.electronAPI.onMenuStartBot(() => {
+            handleStart();
+        });
+        
+        window.electronAPI.onMenuStopBot(() => {
+            handleStop();
+        });
+        
+        window.electronAPI.onMenuCheckSitemap(() => {
+            handleCheckSitemap();
+        });
+        
+        window.electronAPI.onMenuAbout(() => {
+            showAboutDialog();
+        });
+        
         window.electronAPI.onLogMessage((message) => {
             addLog(message);
         });
@@ -423,6 +440,13 @@ function addLog(message, type = '') {
     while (logsContainer.children.length > 500) {
         logsContainer.removeChild(logsContainer.lastChild);
     }
+}
+
+// Show About Dialog
+function showAboutDialog() {
+    const version = '1.0.0';
+    const message = `Google SEO Bot v${version}\n\nOrganik trafik simülasyonu ile SEO sıralamanızı yükseltin.\n\nGitHub: https://github.com/emrahkartals/google-seo-bot\n\n© 2024 emrahkartals`;
+    alert(message);
 }
 
 // Clear Logs

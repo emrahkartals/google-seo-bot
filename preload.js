@@ -16,6 +16,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('visit-recorded', (event, visit) => callback(visit));
     },
     
+    // Menu event listeners
+    onMenuStartBot: (callback) => {
+        ipcRenderer.on('menu-start-bot', () => callback());
+    },
+    onMenuStopBot: (callback) => {
+        ipcRenderer.on('menu-stop-bot', () => callback());
+    },
+    onMenuCheckSitemap: (callback) => {
+        ipcRenderer.on('menu-check-sitemap', () => callback());
+    },
+    onMenuAbout: (callback) => {
+        ipcRenderer.on('menu-about', () => callback());
+    },
+    
     // Cleanup
     removeAllListeners: (channel) => {
         ipcRenderer.removeAllListeners(channel);

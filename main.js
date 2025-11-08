@@ -1,9 +1,156 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const bot = require('./libs/index');
 
 let mainWindow;
 let isRunning = false;
+
+// Menü şablonu oluştur
+function createMenu() {
+    const template = [
+        {
+            label: 'Dosya',
+            submenu: [
+                {
+                    label: 'Yenile',
+                    accelerator: 'CmdOrCtrl+R',
+                    click: (item, focusedWindow) => {
+                        if (focusedWindow) {
+                            focusedWindow.reload();
+                        }
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: 'Çıkış',
+                    accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
+                    click: () => {
+                        app.quit();
+                    }
+                }
+            ]
+        },
+        {
+            label: 'Bot',
+            submenu: [
+                {
+                    label: 'Başlat',
+                    accelerator: 'CmdOrCtrl+S',
+                    enabled: true,
+                    click: () => {
+                        if (mainWindow && !mainWindow.isDestroyed()) {
+                            mainWindow.webContents.send('menu-start-bot');
+                        }
+                    }
+                },
+                {
+                    label: 'Durdur',
+                    accelerator: 'CmdOrCtrl+Shift+S',
+                    enabled: true,
+                    click: () => {
+                        if (mainWindow && !mainWindow.isDestroyed()) {
+                            mainWindow.webContents.send('menu-stop-bot');
+                        }
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: 'Sitemap Kontrol Et',
+                    accelerator: 'CmdOrCtrl+K',
+                    click: () => {
+                        if (mainWindow && !mainWindow.isDestroyed()) {
+                            mainWindow.webContents.send('menu-check-sitemap');
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            label: 'Görünüm',
+            submenu: [
+                {
+                    label: 'Yenile',
+                    accelerator: 'F5',
+                    click: (item, focusedWindow) => {
+                        if (focusedWindow) {
+                            focusedWindow.reload();
+                        }
+                    }
+                },
+                {
+                    label: 'Tam Ekran',
+                    accelerator: process.platform === 'darwin' ? 'Ctrl+Cmd+F' : 'F11',
+                    click: (item, focusedWindow) => {
+                        if (focusedWindow) {
+                            focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+                        }
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: 'Geliştirici Araçları',
+                    accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Ctrl+Shift+I',
+                    click: (item, focusedWindow) => {
+                        if (focusedWindow) {
+                            focusedWindow.webContents.toggleDevTools();
+                        }
+                    }
+                },
+                { type: 'separator' },
+                { role: 'resetZoom', label: 'Yakınlaştırmayı Sıfırla' },
+                { role: 'zoomIn', label: 'Yakınlaştır' },
+                { role: 'zoomOut', label: 'Uzaklaştır' }
+            ]
+        },
+        {
+            label: 'Yardım',
+            submenu: [
+                {
+                    label: 'Hakkında',
+                    click: () => {
+                        if (mainWindow && !mainWindow.isDestroyed()) {
+                            mainWindow.webContents.send('menu-about');
+                        }
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: 'GitHub Repository',
+                    click: () => {
+                        require('electron').shell.openExternal('https://github.com/emrahkartals/google-seo-bot');
+                    }
+                },
+                {
+                    label: 'Dokümantasyon',
+                    click: () => {
+                        require('electron').shell.openExternal('https://github.com/emrahkartals/google-seo-bot#readme');
+                    }
+                }
+            ]
+        }
+    ];
+
+    // macOS için menü düzenlemesi
+    if (process.platform === 'darwin') {
+        template.unshift({
+            label: app.getName(),
+            submenu: [
+                { role: 'about', label: 'Hakkında' },
+                { type: 'separator' },
+                { role: 'services', label: 'Servisler' },
+                { type: 'separator' },
+                { role: 'hide', label: 'Gizle' },
+                { role: 'hideothers', label: 'Diğerlerini Gizle' },
+                { role: 'unhide', label: 'Göster' },
+                { type: 'separator' },
+                { role: 'quit', label: 'Çıkış' }
+            ]
+        });
+    }
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+}
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -103,6 +250,7 @@ ipcMain.handle('get-bot-status', () => {
 
 // Uygulama hazır olduğunda pencere oluştur
 app.whenReady().then(() => {
+    createMenu(); // Menüyü oluştur
     createWindow();
 
     app.on('activate', () => {
