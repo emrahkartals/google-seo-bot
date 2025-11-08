@@ -380,12 +380,12 @@ npm install chromedriver --save
 - ✅ Node.js versiyonunuzun 14.20.0+ olduğunu kontrol edin
 - ✅ Tüm bağımlılıkların yüklü olduğundan emin olun (`npm install`)
 
-## 🤝 Katkıda Bulunma
+## 🤝 Katkıda Bulunabilirsiniz
 
 Katkılarınızı bekliyoruz! Bu projeyi geliştirmek için:
 
-1. ⭐ Bu projeyi yıldızlayın
-2. 🍴 Fork edin
+1. ⭐ Bir yıldızınızı alırım
+2. 🍴 Fork edinin
 3. 🌿 Yeni bir branch oluşturun (`git checkout -b feature/amazing-feature`)
 4. 💾 Değişikliklerinizi commit edin (`git commit -m 'Add some amazing feature'`)
 5. 📤 Branch'inizi push edin (`git push origin feature/amazing-feature`)
