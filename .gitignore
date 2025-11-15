@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+
+# Proxy files (may contain sensitive data)
+# proxy/*.txt - Commented out to allow proxy files in repository
+proxy/*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Electron
+out/
+*.exe
+*.dmg
+*.pkg
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+

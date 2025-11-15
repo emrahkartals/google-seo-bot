@@ -1,0 +1,43 @@
+{
+  "name": "google-seo-bot",
+  "version": "1.4.0",
+  "description": "Google SEO Bot - An advanced Electron-based desktop application designed to improve your website's Google SEO rankings by simulating organic traffic",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "seo",
+    "google",
+    "traffic",
+    "bot",
+    "selenium",
+    "automation",
+    "electron"
+  ],
+  "author": "emrahkartals",
+  "license": "PROPRIETARY",
+  "dependencies": {
+    "selenium-webdriver": "^4.10.0",
+    "chromedriver": "^141.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "engines": {
+    "node": ">=14.20.0"
+  },
+  "build": {
+    "appId": "com.google.seo.bot",
+    "productName": "Google SEO Bot",
+    "win": {
+      "target": "dir",
+      "icon": "build/icon.ico"
+    }
+  }
+}
+

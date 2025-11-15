@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google SEO Bot</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 data-i18n="app.title">🚀 Google SEO Bot</h1>
+                <p class="subtitle" data-i18n="app.subtitle">Organik trafik simülasyonu ile SEO sıralamanızı yükseltin</p>
+            </div>
+            <div class="header-right">
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="tr">🇹🇷 Türkçe</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="ru">🇷🇺 Русский</option>
+                        <option value="ja">🇯🇵 日本語</option>
+                        <option value="ko">🇰🇷 한국어</option>
+                    </select>
+                </div>
+                <button id="theme-toggle" class="theme-toggle" title="Tema Değiştir">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <div class="status-indicator">
+                    <span id="status-dot" class="status-dot"></span>
+                    <span id="status-text" data-i18n="status.ready">Hazır</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Configuration -->
+            <div class="config-panel">
+                <h2 data-i18n="settings.title">⚙️ Ayarlar</h2>
+                
+                <div class="form-group">
+                    <label for="url" data-i18n="settings.url">Site URL'i *</label>
+                    <input type="url" id="url" placeholder="https://example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="visitor-count" data-i18n="settings.visitorCount">Ziyaretçi Sayısı</label>
+                    <input type="number" id="visitor-count" value="10" min="1" max="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="distribution-type" data-i18n="settings.distributionType">Dağılım Tipi</label>
+                    <select id="distribution-type">
+                        <option value="hourly" data-i18n="settings.hourly">Saatlik</option>
+                        <option value="daily" data-i18n="settings.daily">Günlük</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-visitor-rate" data-i18n="settings.newVisitorRate">Yeni Ziyaretçi Oranı (%)</label>
+                    <input type="number" id="new-visitor-rate" value="70" min="0" max="100">
+                    <small data-i18n="settings.newVisitorRateDesc">Yeni ziyaretçiler arama motorundan gelecek</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="search-keywords" data-i18n="settings.searchKeywords">Arama Terimleri (virgülle ayırın)</label>
+                    <textarea id="search-keywords" rows="3" data-i18n-placeholder="settings.searchKeywordsPlaceholder" placeholder="örnek keyword, başka keyword"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="search-engine" data-i18n="settings.searchEngine">Arama Motoru</label>
+                    <select id="search-engine">
+                        <option value="google" data-i18n="searchEngines.google">Google</option>
+                        <option value="bing" data-i18n="searchEngines.bing">Bing</option>
+                        <option value="yahoo" data-i18n="searchEngines.yahoo">Yahoo</option>
+                        <option value="duckduckgo" data-i18n="searchEngines.duckduckgo">DuckDuckGo</option>
+                        <option value="yandex" data-i18n="searchEngines.yandex">Yandex</option>
+                        <option value="direct" data-i18n="searchEngines.direct">Direkt Git</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start-time" data-i18n="settings.startTime">Başlangıç Zamanı</label>
+                        <input type="datetime-local" id="start-time">
+                    </div>
+                    <div class="form-group">
+                        <label for="end-time" data-i18n="settings.endTime">Bitiş Zamanı</label>
+                        <input type="datetime-local" id="end-time">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="page-min-time" data-i18n="settings.pageMinTime">Sayfa Min Süre (sn)</label>
+                        <input type="number" id="page-min-time" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="page-max-time" data-i18n="settings.pageMaxTime">Sayfa Max Süre (sn)</label>
+                        <input type="number" id="page-max-time" value="30" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="total-min-time" data-i18n="settings.totalMinTime">Toplam Min Süre (dk)</label>
+                        <input type="number" id="total-min-time" value="2" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="total-max-time" data-i18n="settings.totalMaxTime">Toplam Max Süre (dk)</label>
+                        <input type="number" id="total-max-time" value="5" min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="page-count" data-i18n="settings.pageCount">Gezilecek Sayfa Sayısı</label>
+                    <input type="number" id="page-count" value="10" min="1" max="100">
+                </div>
+
+                <div class="button-group">
+                    <button id="check-sitemap-btn" class="btn btn-secondary" data-i18n="buttons.checkSitemap">Sitemap Kontrol Et</button>
+                    <button id="test-proxy-btn" class="btn btn-secondary" data-i18n="buttons.testProxy">Proxy Test Et</button>
+                    <button id="download-proxy-btn" class="btn btn-secondary" data-i18n="buttons.downloadProxy">Proxy İndir</button>
+                    <button id="analyze-seo-btn" class="btn btn-secondary" data-i18n="buttons.analyzeSEO">SEO Analizi</button>
+                    <button id="ping-bots-btn" class="btn btn-secondary" data-i18n="buttons.pingBots">Botları Tetikle</button>
+                    <button id="start-btn" class="btn btn-primary" data-i18n="buttons.start">Başlat</button>
+                    <button id="stop-btn" class="btn btn-danger" disabled data-i18n="buttons.stop">Durdur</button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Logs and Charts -->
+            <div class="right-panel">
+                <!-- Chart Panel -->
+                <div class="chart-panel">
+                    <div class="chart-header">
+                        <h2 data-i18n="chart.title">📈 Ziyaret Grafiği</h2>
+                        <div class="chart-controls">
+                            <button id="chart-type-btn" class="btn-small" data-i18n="buttons.line">Çizgi</button>
+                            <button id="reset-chart-btn" class="btn-small" data-i18n="buttons.reset">Sıfırla</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="visits-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Logs Panel -->
+                <div class="logs-panel">
+                    <div class="logs-header">
+                        <h2 data-i18n="logs.title">📊 Loglar</h2>
+                        <button id="clear-logs-btn" class="btn-small" data-i18n="buttons.clear">Temizle</button>
+                    </div>
+                    <div id="logs-container" class="logs-container">
+                        <div class="log-placeholder" data-i18n="logs.placeholder">Loglar burada görünecek...</div>
+                    </div>
+                    <div class="stats-panel">
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="stats.totalVisits">Toplam Ziyaret:</span>
+                            <span id="total-visits" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label" data-i18n="stats.lastVisit">Son Ziyaret:</span>
+                            <span id="last-visit" class="stat-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO Analysis Modal -->
+    <div id="seo-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="seo.title">🔍 SEO Analiz Raporu</h2>
+                <button class="modal-close" id="seo-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="seo-analysis-content">
+                <div class="seo-loading" id="seo-loading">
+                    <p data-i18n="seo.analyzing">Analiz yapılıyor, lütfen bekleyin...</p>
+                </div>
+                <div class="seo-results" id="seo-results" style="display: none;">
+                    <!-- Results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Settings Modal -->
+    <div id="api-settings-modal" class="modal" style="display: none;">
+        <div class="modal-content modal-medium">
+            <div class="modal-header">
+                <h2 data-i18n="apiSettings.title">🔑 API Ayarları</h2>
+                <button class="modal-close" id="api-settings-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="api-settings-content">
+                    <p class="api-settings-description" data-i18n="apiSettings.description">
+                        AI destekli SEO önerileri için API key'lerinizi ekleyin. API key'ler yerel olarak saklanır ve güvenlidir.
+                    </p>
+                    
+                    <div class="form-group">
+                        <label for="openai-api-key" data-i18n="apiSettings.openaiKey">OpenAI API Key</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="openai-api-key" class="api-key-input" placeholder="sk-...">
+                            <button type="button" class="btn-toggle-visibility" id="toggle-openai-visibility" title="Göster/Gizle">
+                                👁️
+                            </button>
+                        </div>
+                        <small data-i18n="apiSettings.openaiKeyDesc">OpenAI API key'inizi <a href="https://platform.openai.com/api-keys" target="_blank">buradan</a> alabilirsiniz</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anthropic-api-key" data-i18n="apiSettings.anthropicKey">Anthropic (Claude) API Key</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="anthropic-api-key" class="api-key-input" placeholder="sk-ant-...">
+                            <button type="button" class="btn-toggle-visibility" id="toggle-anthropic-visibility" title="Göster/Gizle">
+                                👁️
+                            </button>
+                        </div>
+                        <small data-i18n="apiSettings.anthropicKeyDesc">Anthropic API key'inizi <a href="https://console.anthropic.com/" target="_blank">buradan</a> alabilirsiniz</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-api-key" data-i18n="apiSettings.googleKey">Google Gemini API Key</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="google-api-key" class="api-key-input" placeholder="AIza...">
+                            <button type="button" class="btn-toggle-visibility" id="toggle-google-visibility" title="Göster/Gizle">
+                                👁️
+                            </button>
+                        </div>
+                        <small data-i18n="apiSettings.googleKeyDesc">Google Gemini API key'inizi <a href="https://makersuite.google.com/app/apikey" target="_blank">buradan</a> alabilirsiniz</small>
+                    </div>
+
+                    <div class="api-settings-info">
+                        <p data-i18n="apiSettings.info">
+                            💡 <strong>Not:</strong> API key'ler opsiyoneldir. API key eklemezseniz, kural tabanlı akıllı öneri sistemi kullanılır. 
+                            API key eklerseniz, daha gelişmiş AI destekli öneriler alırsınız.
+                        </p>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button id="save-api-keys-btn" class="btn btn-primary" data-i18n="apiSettings.save">Kaydet</button>
+                        <button id="clear-api-keys-btn" class="btn btn-secondary" data-i18n="apiSettings.clear">Temizle</button>
+                        <button id="cancel-api-settings-btn" class="btn btn-secondary" data-i18n="apiSettings.cancel">İptal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Protected Footer -->
+    <footer id="app-footer" class="app-footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                © 2024 <span class="footer-author" id="footer-author">emrahkartals</span> - All Rights Reserved
+            </p>
+            <p class="footer-license">Proprietary Software - Unauthorized copying prohibited</p>
+        </div>
+    </footer>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+
