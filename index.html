@@ -122,6 +122,8 @@
                 <div class="button-group">
                     <button id="check-sitemap-btn" class="btn btn-secondary" data-i18n="buttons.checkSitemap">Sitemap Kontrol Et</button>
                     <button id="test-proxy-btn" class="btn btn-secondary" data-i18n="buttons.testProxy">Proxy Test Et</button>
+                    <button id="analyze-seo-btn" class="btn btn-secondary" data-i18n="buttons.analyzeSEO">SEO Analizi</button>
+                    <button id="ping-bots-btn" class="btn btn-secondary" data-i18n="buttons.pingBots">Botları Tetikle</button>
                     <button id="start-btn" class="btn btn-primary" data-i18n="buttons.start">Başlat</button>
                     <button id="stop-btn" class="btn btn-danger" disabled data-i18n="buttons.stop">Durdur</button>
                 </div>
@@ -161,6 +163,87 @@
                             <span class="stat-label" data-i18n="stats.lastVisit">Son Ziyaret:</span>
                             <span id="last-visit" class="stat-value">-</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO Analysis Modal -->
+    <div id="seo-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="seo.title">🔍 SEO Analiz Raporu</h2>
+                <button class="modal-close" id="seo-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="seo-analysis-content">
+                <div class="seo-loading" id="seo-loading">
+                    <p data-i18n="seo.analyzing">Analiz yapılıyor, lütfen bekleyin...</p>
+                </div>
+                <div class="seo-results" id="seo-results" style="display: none;">
+                    <!-- Results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Settings Modal -->
+    <div id="api-settings-modal" class="modal" style="display: none;">
+        <div class="modal-content modal-medium">
+            <div class="modal-header">
+                <h2 data-i18n="apiSettings.title">🔑 API Ayarları</h2>
+                <button class="modal-close" id="api-settings-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="api-settings-content">
+                    <p class="api-settings-description" data-i18n="apiSettings.description">
+                        AI destekli SEO önerileri için API key'lerinizi ekleyin. API key'ler yerel olarak saklanır ve güvenlidir.
+                    </p>
+                    
+                    <div class="form-group">
+                        <label for="openai-api-key" data-i18n="apiSettings.openaiKey">OpenAI API Key</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="openai-api-key" class="api-key-input" placeholder="sk-...">
+                            <button type="button" class="btn-toggle-visibility" id="toggle-openai-visibility" title="Göster/Gizle">
+                                👁️
+                            </button>
+                        </div>
+                        <small data-i18n="apiSettings.openaiKeyDesc">OpenAI API key'inizi <a href="https://platform.openai.com/api-keys" target="_blank">buradan</a> alabilirsiniz</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anthropic-api-key" data-i18n="apiSettings.anthropicKey">Anthropic (Claude) API Key</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="anthropic-api-key" class="api-key-input" placeholder="sk-ant-...">
+                            <button type="button" class="btn-toggle-visibility" id="toggle-anthropic-visibility" title="Göster/Gizle">
+                                👁️
+                            </button>
+                        </div>
+                        <small data-i18n="apiSettings.anthropicKeyDesc">Anthropic API key'inizi <a href="https://console.anthropic.com/" target="_blank">buradan</a> alabilirsiniz</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="google-api-key" data-i18n="apiSettings.googleKey">Google Gemini API Key</label>
+                        <div class="input-with-toggle">
+                            <input type="password" id="google-api-key" class="api-key-input" placeholder="AIza...">
+                            <button type="button" class="btn-toggle-visibility" id="toggle-google-visibility" title="Göster/Gizle">
+                                👁️
+                            </button>
+                        </div>
+                        <small data-i18n="apiSettings.googleKeyDesc">Google Gemini API key'inizi <a href="https://makersuite.google.com/app/apikey" target="_blank">buradan</a> alabilirsiniz</small>
+                    </div>
+
+                    <div class="api-settings-info">
+                        <p data-i18n="apiSettings.info">
+                            💡 <strong>Not:</strong> API key'ler opsiyoneldir. API key eklemezseniz, kural tabanlı akıllı öneri sistemi kullanılır. 
+                            API key eklerseniz, daha gelişmiş AI destekli öneriler alırsınız.
+                        </p>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button id="save-api-keys-btn" class="btn btn-primary" data-i18n="apiSettings.save">Kaydet</button>
+                        <button id="clear-api-keys-btn" class="btn btn-secondary" data-i18n="apiSettings.clear">Temizle</button>
+                        <button id="cancel-api-settings-btn" class="btn btn-secondary" data-i18n="apiSettings.cancel">İptal</button>
                     </div>
                 </div>
             </div>

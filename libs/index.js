@@ -10,6 +10,7 @@ const spoofing = require('./spoofing')
 
 var logCallback = null
 var visitCallback = null
+var rankingCallback = null
 var isRunning = false
 var scheduledVisits = []
 var visitInterval = null
@@ -46,6 +47,24 @@ function recordVisit() {
         }
     } else {
         log(`[VISIT] Visit callback ayarlanmamış`)
+    }
+}
+
+function recordRanking(url, keyword, position, page, engine) {
+    if (rankingCallback) {
+        try {
+            rankingCallback({
+                url: url,
+                keyword: keyword,
+                position: position,
+                page: page || 1,
+                engine: engine || 'google',
+                timestamp: new Date().toISOString()
+            })
+            log(`[RANKING] Sıralama kaydedildi: ${keyword} - Pozisyon ${position} (Sayfa ${page || 1})`)
+        } catch (e) {
+            log(`[RANKING] Sıralama kaydı hatası: ${e.message}`)
+        }
     }
 }
 
@@ -868,23 +887,29 @@ async function googleSearch(url, keyboard, proxy, minTime, maxTime, alwaysDirect
         
         logI18n('logMessages.googleSearchingUrl')
         var pageId = await findSiteUrl(driver, url)
+        var currentPage = 1
         await delay(2000)
         
         // Eğer ilk sayfada bulunamadıysa, birkaç sayfa daha dene
         if (pageId == -1) {
             logI18n('logMessages.googleNotFoundFirstPage')
             pageId = await nextPage(driver, url)
+            currentPage = 2
         }
         
         // Eğer hala bulunamadıysa, direkt siteye git (ama Google'da arama yapılmış oldu - SEO için önemli)
         if (pageId == -1) {
             logI18n('logMessages.googleNotFound')
             logI18n('logMessages.googleNote')
+            // Sıralama bulunamadı, kaydet
+            recordRanking(url, keyboard, -1, currentPage, 'google')
             await driver.get(url)
             await delay(2000)
         } else {
-            // Site bulundu, tıkla
-            logI18n('logMessages.googleFound', {position: pageId + 1})
+            // Site bulundu, sıralamayı kaydet
+            var position = pageId + 1 + ((currentPage - 1) * 10) // Sayfa başına ~10 sonuç
+            recordRanking(url, keyboard, position, currentPage, 'google')
+            logI18n('logMessages.googleFound', {position: position})
             await delay(1000)
             await clickPage(driver, pageId)
         }
@@ -1519,6 +1544,10 @@ function setVisitCallback(callback) {
     visitCallback = callback
 }
 
+function setRankingCallback(callback) {
+    rankingCallback = callback
+}
+
 // Sitemap kontrolü
 async function checkSitemap(url) {
     try {
@@ -2045,12 +2074,758 @@ async function testProxies() {
     return results
 }
 
+// Arama motoru botlarını tetikle (ping servisleri)
+async function pingSearchEngines(url) {
+    log(`[PING] Arama motoru botları tetikleniyor... URL: ${url}`)
+    var results = {
+        url: url,
+        timestamp: new Date().toISOString(),
+        pings: {},
+        errors: []
+    }
+    
+    try {
+        var urlObj = new URL(url)
+        var baseUrl = urlObj.origin
+        
+        // 1. Sitemap ping
+        try {
+            var sitemapUrl = await getSitemapUrl(baseUrl)
+            if (sitemapUrl) {
+                log(`[PING] Sitemap bulundu: ${sitemapUrl}`)
+                
+                // Google Sitemap Ping
+                try {
+                    var googlePingUrl = `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`
+                    await fetchUrl(googlePingUrl)
+                    results.pings.googleSitemap = { success: true, message: 'Google sitemap ping başarılı' }
+                    log(`[PING] ✅ Google sitemap ping başarılı`)
+                } catch (e) {
+                    results.pings.googleSitemap = { success: false, message: e.message }
+                    results.errors.push(`Google sitemap ping: ${e.message}`)
+                    log(`[PING] ❌ Google sitemap ping hatası: ${e.message}`)
+                }
+                
+                // Bing Sitemap Ping
+                try {
+                    var bingPingUrl = `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`
+                    await fetchUrl(bingPingUrl)
+                    results.pings.bingSitemap = { success: true, message: 'Bing sitemap ping başarılı' }
+                    log(`[PING] ✅ Bing sitemap ping başarılı`)
+                } catch (e) {
+                    results.pings.bingSitemap = { success: false, message: e.message }
+                    results.errors.push(`Bing sitemap ping: ${e.message}`)
+                    log(`[PING] ❌ Bing sitemap ping hatası: ${e.message}`)
+                }
+            } else {
+                log(`[PING] ⚠️ Sitemap bulunamadı, sadece URL ping yapılıyor`)
+            }
+        } catch (e) {
+            results.errors.push(`Sitemap kontrolü: ${e.message}`)
+        }
+        
+        // 2. URL Ping Servisleri
+        // Google URL Ping (artık deprecated ama deneyebiliriz)
+        try {
+            // Google'ın yeni yöntemi: Google Search Console API kullanılmalı
+            // Ama basit ping için alternatif servisler kullanabiliriz
+            log(`[PING] URL ping servisleri deneniyor...`)
+        } catch (e) {
+            results.errors.push(`URL ping: ${e.message}`)
+        }
+        
+        // 3. RSS Ping (eğer RSS feed varsa)
+        try {
+            var rssUrl = baseUrl + '/feed'
+            var rssExists = await checkUrlExists(rssUrl)
+            if (rssExists) {
+                log(`[PING] RSS feed bulundu: ${rssUrl}`)
+                // RSS ping servisleri
+                var rssPingServices = [
+                    'https://rpc.weblogs.com/ping',
+                    'https://ping.blogs.yandex.ru/ping'
+                ]
+                
+                for (var i = 0; i < rssPingServices.length; i++) {
+                    try {
+                        // RSS ping formatı genelde POST gerektirir, basit versiyon için atlayalım
+                        log(`[PING] RSS ping servisi mevcut: ${rssPingServices[i]}`)
+                    } catch (e) {
+                        // RSS ping opsiyonel, hata önemli değil
+                    }
+                }
+            }
+        } catch (e) {
+            // RSS ping opsiyonel
+        }
+        
+        // 4. Social Media Ping (botlar bunları takip eder)
+        // Twitter, Facebook gibi platformlar botları tetikler
+        log(`[PING] Social media ping önerisi: URL'yi sosyal medyada paylaşmak botları tetikler`)
+        
+        var successCount = Object.values(results.pings).filter(p => p.success).length
+        var totalCount = Object.keys(results.pings).length
+        
+        log(`[PING] Ping tamamlandı! Başarılı: ${successCount}/${totalCount}`)
+        
+        return results
+        
+    } catch (err) {
+        log(`[PING] Genel hata: ${err.message}`)
+        results.errors.push(`Genel hata: ${err.message}`)
+        return results
+    }
+}
+
+// URL'nin var olup olmadığını kontrol et
+async function checkUrlExists(url) {
+    return new Promise((resolve) => {
+        try {
+            var urlObj = new URL(url)
+            var client = urlObj.protocol === 'https:' ? https : http
+            
+            var req = client.get(url, { timeout: 5000 }, (res) => {
+                resolve(res.statusCode === 200)
+                res.destroy()
+            })
+            
+            req.on('error', () => resolve(false))
+            req.on('timeout', () => {
+                req.destroy()
+                resolve(false)
+            })
+            
+            req.setTimeout(5000)
+        } catch (e) {
+            resolve(false)
+        }
+    })
+}
+
+// SEO Önerileri oluştur (Akıllı öneri sistemi)
+function generateSEORecommendations(analysis) {
+    var recommendations = []
+    var priority = 'high' // high, medium, low
+    
+    // 1. Meta Tags Önerileri
+    var meta = analysis.checks.metaTags || {}
+    if (!meta.title || meta.titleLength === 0) {
+        recommendations.push({
+            category: 'Meta Tags',
+            priority: 'high',
+            issue: 'Title tag eksik',
+            recommendation: 'Sayfanıza bir <title> tag\'i ekleyin. Title 30-60 karakter arasında olmalı ve anahtar kelimelerinizi içermelidir.',
+            example: '<title>Anahtar Kelime - Şirket Adı</title>',
+            impact: 'Yüksek - Google arama sonuçlarında görünecek'
+        })
+    } else if (!meta.titleGood) {
+        if (meta.titleLength < 30) {
+            recommendations.push({
+                category: 'Meta Tags',
+                priority: 'high',
+                issue: 'Title çok kısa',
+                recommendation: `Title'ınız ${meta.titleLength} karakter. En az 30 karakter olmalı. Title'ı genişletin ve anahtar kelimeler ekleyin.`,
+                example: `Mevcut: "${meta.title}" → Önerilen: "${meta.title} - Daha Fazla Bilgi"`,
+                impact: 'Yüksek - Arama sonuçlarında daha iyi görünür'
+            })
+        } else if (meta.titleLength > 60) {
+            recommendations.push({
+                category: 'Meta Tags',
+                priority: 'medium',
+                issue: 'Title çok uzun',
+                recommendation: `Title'ınız ${meta.titleLength} karakter. Google genelde ilk 60 karakteri gösterir. Title'ı kısaltın.`,
+                example: `Mevcut: "${meta.title}" → Önerilen: "${meta.title.substring(0, 57)}..."`,
+                impact: 'Orta - Google title\'ı kesebilir'
+            })
+        }
+    }
+    
+    if (!meta.description || meta.descriptionLength === 0) {
+        recommendations.push({
+            category: 'Meta Tags',
+            priority: 'high',
+            issue: 'Meta description eksik',
+            recommendation: 'Sayfanıza bir meta description ekleyin. 120-160 karakter arasında olmalı ve sayfanın içeriğini özetlemelidir.',
+            example: '<meta name="description" content="Sayfanızın kısa ve öz açıklaması buraya gelecek. Anahtar kelimelerinizi içermelidir.">',
+            impact: 'Yüksek - Arama sonuçlarında snippet olarak görünür'
+        })
+    } else if (!meta.descriptionGood) {
+        if (meta.descriptionLength < 120) {
+            recommendations.push({
+                category: 'Meta Tags',
+                priority: 'high',
+                issue: 'Meta description çok kısa',
+                recommendation: `Description'ınız ${meta.descriptionLength} karakter. En az 120 karakter olmalı. Daha detaylı bir açıklama ekleyin.`,
+                example: `Mevcut: "${meta.description}" → Önerilen: "${meta.description} - Daha fazla bilgi ve detaylar buraya eklenebilir."`,
+                impact: 'Yüksek - Daha iyi snippet oluşturur'
+            })
+        } else if (meta.descriptionLength > 160) {
+            recommendations.push({
+                category: 'Meta Tags',
+                priority: 'medium',
+                issue: 'Meta description çok uzun',
+                recommendation: `Description'ınız ${meta.descriptionLength} karakter. Google genelde ilk 160 karakteri gösterir. Kısaltın.`,
+                example: `Mevcut: "${meta.description}" → Önerilen: "${meta.description.substring(0, 157)}..."`,
+                impact: 'Orta - Google description\'ı kesebilir'
+            })
+        }
+    }
+    
+    if (!meta.ogTitle || !meta.ogImage) {
+        recommendations.push({
+            category: 'Social Media',
+            priority: 'medium',
+            issue: 'Open Graph tags eksik',
+            recommendation: 'Sosyal medyada paylaşıldığında daha iyi görünmesi için Open Graph tags ekleyin.',
+            example: '<meta property="og:title" content="Başlık">\n<meta property="og:description" content="Açıklama">\n<meta property="og:image" content="https://example.com/image.jpg">',
+            impact: 'Orta - Sosyal medya paylaşımlarında daha iyi görünüm'
+        })
+    }
+    
+    // 2. Heading Tags Önerileri
+    var headings = analysis.checks.headings || {}
+    if (headings.h1Count === 0) {
+        recommendations.push({
+            category: 'Content Structure',
+            priority: 'high',
+            issue: 'H1 tag eksik',
+            recommendation: 'Sayfanıza mutlaka bir H1 tag\'i ekleyin. H1, sayfanın ana başlığı olmalı ve anahtar kelimelerinizi içermelidir.',
+            example: '<h1>Ana Başlık - Anahtar Kelime</h1>',
+            impact: 'Yüksek - SEO için kritik öneme sahip'
+        })
+    } else if (headings.h1Count > 1) {
+        recommendations.push({
+            category: 'Content Structure',
+            priority: 'high',
+            issue: 'Birden fazla H1 tag var',
+            recommendation: `Sayfanızda ${headings.h1Count} adet H1 tag var. SEO için sadece 1 H1 olmalı. Fazla H1'leri H2 veya H3'e çevirin.`,
+            example: 'İkinci H1\'i H2\'ye çevirin: <h2>İkinci Başlık</h2>',
+            impact: 'Yüksek - Google için karışıklık yaratır'
+        })
+    }
+    
+    if (headings.h2Count === 0 && headings.h3Count === 0) {
+        recommendations.push({
+            category: 'Content Structure',
+            priority: 'medium',
+            issue: 'Alt başlıklar eksik',
+            recommendation: 'İçeriğinizi organize etmek için H2 ve H3 başlıkları ekleyin. Bu hem SEO hem de kullanıcı deneyimi için önemlidir.',
+            example: '<h2>Alt Başlık 1</h2>\n<p>İçerik...</p>\n<h3>Alt Alt Başlık</h3>',
+            impact: 'Orta - İçerik yapısını iyileştirir'
+        })
+    }
+    
+    // 3. Images Önerileri
+    var images = analysis.checks.images || {}
+    if (images.total > 0 && images.altPercentage < 80) {
+        recommendations.push({
+            category: 'Images',
+            priority: 'high',
+            issue: `${images.withoutAlt} resim alt tag'siz`,
+            recommendation: `Sayfanızda ${images.withoutAlt} resim alt tag'i olmadan. Tüm resimlere açıklayıcı alt tag'leri ekleyin.`,
+            example: '<img src="image.jpg" alt="Açıklayıcı resim açıklaması">',
+            impact: 'Yüksek - Erişilebilirlik ve SEO için önemli'
+        })
+    }
+    
+    // 4. Content Önerileri
+    var content = analysis.checks.content || {}
+    if (!content.wordCountGood) {
+        recommendations.push({
+            category: 'Content',
+            priority: 'high',
+            issue: 'İçerik çok kısa',
+            recommendation: `Sayfanızda sadece ${content.wordCount} kelime var. SEO için en az 300 kelime önerilir. Daha fazla içerik ekleyin.`,
+            example: 'İlgili konularda detaylı açıklamalar, örnekler ve bilgiler ekleyin.',
+            impact: 'Yüksek - Google içerik kalitesini değerlendirir'
+        })
+    }
+    
+    // 5. Technical SEO Önerileri
+    if (!analysis.checks.ssl?.secure) {
+        recommendations.push({
+            category: 'Security',
+            priority: 'high',
+            issue: 'HTTPS kullanılmıyor',
+            recommendation: 'Siteniz HTTP kullanıyor. HTTPS\'e geçiş yapın. Google HTTPS kullanan sitelere öncelik verir.',
+            example: 'SSL sertifikası alın ve sitenizi HTTPS\'e yönlendirin.',
+            impact: 'Yüksek - Güvenlik ve SEO için kritik'
+        })
+    }
+    
+    if (!analysis.checks.mobile?.hasViewport) {
+        recommendations.push({
+            category: 'Mobile',
+            priority: 'high',
+            issue: 'Mobile-friendly değil',
+            recommendation: 'Sayfanızda viewport meta tag\'i yok. Mobil cihazlarda düzgün görünmesi için ekleyin.',
+            example: '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            impact: 'Yüksek - Mobil SEO için gerekli'
+        })
+    }
+    
+    if (!analysis.checks.schema?.hasSchema) {
+        recommendations.push({
+            category: 'Structured Data',
+            priority: 'medium',
+            issue: 'Schema markup yok',
+            recommendation: 'Google\'ın içeriğinizi daha iyi anlaması için Schema.org structured data ekleyin.',
+            example: '<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage"...}</script>',
+            impact: 'Orta - Rich snippets için fırsat'
+        })
+    }
+    
+    if (analysis.loadTime >= 3000) {
+        recommendations.push({
+            category: 'Performance',
+            priority: 'medium',
+            issue: 'Sayfa yükleme süresi yavaş',
+            recommendation: `Sayfanız ${Math.round(analysis.loadTime / 1000)} saniyede yükleniyor. 3 saniyenin altına indirmeye çalışın.`,
+            example: 'Resimleri optimize edin, CSS/JS dosyalarını küçültün, CDN kullanın.',
+            impact: 'Orta - Kullanıcı deneyimi ve SEO için önemli'
+        })
+    }
+    
+    if (!analysis.checks.sitemap?.found) {
+        recommendations.push({
+            category: 'SEO Files',
+            priority: 'medium',
+            issue: 'Sitemap bulunamadı',
+            recommendation: 'Google\'ın sitenizi daha iyi indexlemesi için sitemap.xml dosyası oluşturun.',
+            example: 'Sitemap oluşturucu araçlar kullanın veya CMS\'iniz otomatik oluşturuyor mu kontrol edin.',
+            impact: 'Orta - Indexleme için yardımcı'
+        })
+    }
+    
+    if (!analysis.checks.robotsTxt?.found) {
+        recommendations.push({
+            category: 'SEO Files',
+            priority: 'low',
+            issue: 'Robots.txt yok',
+            recommendation: 'Arama motoru botlarını yönlendirmek için robots.txt dosyası oluşturun (opsiyonel).',
+            example: 'User-agent: *\nAllow: /',
+            impact: 'Düşük - Opsiyonel ama önerilir'
+        })
+    }
+    
+    // Öncelik sırasına göre sırala
+    var priorityOrder = { 'high': 1, 'medium': 2, 'low': 3 }
+    recommendations.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+    
+    return recommendations
+}
+
+// URL fetch helper
+async function fetchUrl(url) {
+    return new Promise((resolve, reject) => {
+        try {
+            var urlObj = new URL(url)
+            var client = urlObj.protocol === 'https:' ? https : http
+            
+            var req = client.get(url, { timeout: 10000 }, (res) => {
+                var data = ''
+                res.on('data', (chunk) => { data += chunk })
+                res.on('end', () => {
+                    resolve(data)
+                })
+            })
+            
+            req.on('error', (err) => reject(err))
+            req.on('timeout', () => {
+                req.destroy()
+                reject(new Error('Timeout'))
+            })
+            
+            req.setTimeout(10000)
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+// SEO Analizi yap
+async function analyzeSEO(url) {
+    log(`[SEO ANALİZ] SEO analizi başlatılıyor... URL: ${url}`)
+    var options = new chrome.Options()
+    PERMISSIONS.forEach(perms => {
+        options.addArguments(perms)
+    })
+    options.excludeSwitches('enable-logging')
+    options.addArguments('--headless') // Analiz için headless
+    
+    var driver = null
+    var analysis = {
+        url: url,
+        timestamp: new Date().toISOString(),
+        score: 0,
+        maxScore: 100,
+        checks: {},
+        errors: []
+    }
+    
+    try {
+        var startTime = Date.now()
+        driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
+        await Stealth(driver)
+        
+        await driver.get(url)
+        await delay(5000) // Sayfanın yüklenmesini bekle
+        
+        var loadTime = Date.now() - startTime
+        analysis.loadTime = loadTime
+        
+        // Sayfa HTML'ini al
+        var pageSource = await driver.getPageSource()
+        var pageTitle = await driver.getTitle()
+        
+        // 1. Meta Tags Kontrolü
+        log(`[SEO ANALİZ] Meta tags kontrol ediliyor...`)
+        var metaTitle = await driver.executeScript(`
+            var title = document.querySelector('title');
+            return title ? title.textContent.trim() : '';
+        `)
+        var metaDescription = await driver.executeScript(`
+            var desc = document.querySelector('meta[name="description"]');
+            return desc ? desc.getAttribute('content') : '';
+        `)
+        var metaKeywords = await driver.executeScript(`
+            var keywords = document.querySelector('meta[name="keywords"]');
+            return keywords ? keywords.getAttribute('content') : '';
+        `)
+        var ogTitle = await driver.executeScript(`
+            var og = document.querySelector('meta[property="og:title"]');
+            return og ? og.getAttribute('content') : '';
+        `)
+        var ogDescription = await driver.executeScript(`
+            var og = document.querySelector('meta[property="og:description"]');
+            return og ? og.getAttribute('content') : '';
+        `)
+        var ogImage = await driver.executeScript(`
+            var og = document.querySelector('meta[property="og:image"]');
+            return og ? og.getAttribute('content') : '';
+        `)
+        var twitterCard = await driver.executeScript(`
+            var tw = document.querySelector('meta[name="twitter:card"]');
+            return tw ? tw.getAttribute('content') : '';
+        `)
+        
+        analysis.checks.metaTags = {
+            title: metaTitle || pageTitle,
+            titleLength: (metaTitle || pageTitle).length,
+            titleGood: (metaTitle || pageTitle).length >= 30 && (metaTitle || pageTitle).length <= 60,
+            description: metaDescription,
+            descriptionLength: metaDescription ? metaDescription.length : 0,
+            descriptionGood: metaDescription ? (metaDescription.length >= 120 && metaDescription.length <= 160) : false,
+            keywords: metaKeywords,
+            ogTitle: ogTitle,
+            ogDescription: ogDescription,
+            ogImage: ogImage,
+            twitterCard: twitterCard
+        }
+        
+        // 2. Heading Tags
+        log(`[SEO ANALİZ] Heading tags kontrol ediliyor...`)
+        var headings = await driver.executeScript(`
+            var h1 = document.querySelectorAll('h1');
+            var h2 = document.querySelectorAll('h2');
+            var h3 = document.querySelectorAll('h3');
+            return {
+                h1: Array.from(h1).map(h => h.textContent.trim()),
+                h2: Array.from(h2).map(h => h.textContent.trim()),
+                h3: Array.from(h3).map(h => h.textContent.trim())
+            };
+        `)
+        
+        analysis.checks.headings = {
+            h1: headings.h1,
+            h1Count: headings.h1.length,
+            h1Good: headings.h1.length === 1,
+            h2: headings.h2,
+            h2Count: headings.h2.length,
+            h3: headings.h3,
+            h3Count: headings.h3.length
+        }
+        
+        // 3. Images Alt Tags
+        log(`[SEO ANALİZ] Image alt tags kontrol ediliyor...`)
+        var images = await driver.executeScript(`
+            var imgs = document.querySelectorAll('img');
+            var result = [];
+            for (var i = 0; i < imgs.length; i++) {
+                var img = imgs[i];
+                result.push({
+                    src: img.src || '',
+                    alt: img.alt || '',
+                    hasAlt: !!img.alt
+                });
+            }
+            return result;
+        `)
+        
+        var imagesWithAlt = images.filter(img => img.hasAlt).length
+        var imagesWithoutAlt = images.length - imagesWithAlt
+        
+        analysis.checks.images = {
+            total: images.length,
+            withAlt: imagesWithAlt,
+            withoutAlt: imagesWithoutAlt,
+            altPercentage: images.length > 0 ? Math.round((imagesWithAlt / images.length) * 100) : 100
+        }
+        
+        // 4. Links
+        log(`[SEO ANALİZ] Links kontrol ediliyor...`)
+        var links = await driver.executeScript(`
+            var links = document.querySelectorAll('a[href]');
+            var internal = 0, external = 0, nofollow = 0;
+            var baseUrl = window.location.origin;
+            for (var i = 0; i < links.length; i++) {
+                var href = links[i].href;
+                var rel = links[i].rel || '';
+                if (rel.includes('nofollow')) nofollow++;
+                if (href.startsWith(baseUrl) || href.startsWith('/')) {
+                    internal++;
+                } else if (href.startsWith('http')) {
+                    external++;
+                }
+            }
+            return { total: links.length, internal: internal, external: external, nofollow: nofollow };
+        `)
+        
+        analysis.checks.links = links
+        
+        // 5. Content Analysis
+        log(`[SEO ANALİZ] İçerik analizi yapılıyor...`)
+        var content = await driver.executeScript(`
+            var body = document.body;
+            return body ? body.innerText.trim() : '';
+        `)
+        
+        var wordCount = content.split(/\s+/).filter(w => w.length > 0).length
+        var charCount = content.length
+        
+        analysis.checks.content = {
+            wordCount: wordCount,
+            charCount: charCount,
+            wordCountGood: wordCount >= 300,
+            hasContent: wordCount > 0
+        }
+        
+        // 6. Mobile-Friendly
+        log(`[SEO ANALİZ] Mobile-friendly kontrol ediliyor...`)
+        var viewport = await driver.executeScript(`
+            var viewport = document.querySelector('meta[name="viewport"]');
+            return viewport ? viewport.getAttribute('content') : '';
+        `)
+        
+        analysis.checks.mobile = {
+            hasViewport: !!viewport,
+            viewportContent: viewport
+        }
+        
+        // 7. SSL/HTTPS
+        var isHTTPS = url.startsWith('https://')
+        analysis.checks.ssl = {
+            isHTTPS: isHTTPS,
+            secure: isHTTPS
+        }
+        
+        // 8. URL Structure
+        var urlObj = new URL(url)
+        var urlPath = urlObj.pathname
+        var hasGoodUrl = !urlPath.includes('_') && !urlPath.match(/\d{4}\/\d{2}\/\d{2}/) // Tarih formatı yok
+        analysis.checks.url = {
+            path: urlPath,
+            hasGoodStructure: hasGoodUrl,
+            length: url.length,
+            lengthGood: url.length <= 100
+        }
+        
+        // 9. Schema Markup
+        log(`[SEO ANALİZ] Schema markup kontrol ediliyor...`)
+        var schema = await driver.executeScript(`
+            var scripts = document.querySelectorAll('script[type="application/ld+json"]');
+            return scripts.length;
+        `)
+        
+        analysis.checks.schema = {
+            hasSchema: schema > 0,
+            schemaCount: schema
+        }
+        
+        // 10. Robots Meta
+        var robotsMeta = await driver.executeScript(`
+            var robots = document.querySelector('meta[name="robots"]');
+            return robots ? robots.getAttribute('content') : '';
+        `)
+        
+        analysis.checks.robots = {
+            robotsMeta: robotsMeta,
+            hasRobotsMeta: !!robotsMeta
+        }
+        
+        // Score Hesapla
+        var score = 0
+        if (analysis.checks.metaTags.titleGood) score += 10
+        if (analysis.checks.metaTags.descriptionGood) score += 10
+        if (analysis.checks.headings.h1Good) score += 10
+        if (analysis.checks.images.altPercentage >= 80) score += 10
+        if (analysis.checks.content.wordCountGood) score += 10
+        if (analysis.checks.mobile.hasViewport) score += 10
+        if (analysis.checks.ssl.secure) score += 10
+        if (analysis.checks.url.hasGoodStructure) score += 5
+        if (analysis.checks.url.lengthGood) score += 5
+        if (analysis.checks.schema.hasSchema) score += 10
+        if (loadTime < 3000) score += 10
+        
+        analysis.score = score
+        
+        // Sitemap ve Robots.txt kontrolü
+        try {
+            var baseUrl = urlObj.origin
+            var sitemapUrl = await getSitemapUrl(baseUrl)
+            analysis.checks.sitemap = {
+                found: !!sitemapUrl,
+                url: sitemapUrl
+            }
+            
+            var robotsTxtUrl = baseUrl + '/robots.txt'
+            try {
+                var robotsContent = await fetchSitemap(robotsTxtUrl)
+                analysis.checks.robotsTxt = {
+                    found: true,
+                    hasContent: robotsContent.length > 0
+                }
+            } catch (e) {
+                analysis.checks.robotsTxt = {
+                    found: false
+                }
+            }
+        } catch (e) {
+            analysis.errors.push(`Sitemap/Robots kontrolü hatası: ${e.message}`)
+        }
+        
+        log(`[SEO ANALİZ] Analiz tamamlandı! Skor: ${score}/100`)
+        
+        // SEO Önerileri oluştur
+        analysis.recommendations = generateSEORecommendations(analysis)
+        
+        await driver.quit()
+        return analysis
+        
+    } catch (err) {
+        log(`[SEO ANALİZ] Hata: ${err.message}`)
+        analysis.errors.push(err.message)
+        if (driver) {
+            try {
+                await driver.quit()
+            } catch (e) {}
+        }
+        return analysis
+    }
+}
+
+// Google sıralamasını kontrol et (sadece kontrol, ziyaret yapmaz)
+async function checkRanking(url, keyword) {
+    log(`[RANKING CHECK] Sıralama kontrol ediliyor... URL: ${url}, Keyword: "${keyword}"`)
+    var options = new chrome.Options()
+    PERMISSIONS.forEach(perms => {
+        options.addArguments(perms)
+    })
+    options.excludeSwitches('enable-logging')
+    options.addArguments('--headless') // Sadece kontrol için headless
+    
+    var driver = null
+    try {
+        driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
+        await Stealth(driver)
+        
+        await driver.get("https://www.google.com/")
+        await delay(3000)
+        
+        // Cookie kabul et
+        try {
+            var acceptSelectors = [
+                webDriver.By.css('button[id*="L2AGLb"]'),
+                webDriver.By.css('.QS5gu'),
+                webDriver.By.css('button[aria-label*="Accept"]')
+            ]
+            for (var s = 0; s < acceptSelectors.length; s++) {
+                try {
+                    var accept_cookies = await driver.findElements(acceptSelectors[s])
+                    if (accept_cookies.length > 0) {
+                        var isDisplayed = await accept_cookies[0].isDisplayed()
+                        if (isDisplayed) {
+                            await accept_cookies[0].click()
+                            await delay(2000)
+                            break
+                        }
+                    }
+                } catch (e) {
+                    continue
+                }
+            }
+        } catch (e) {}
+        
+        // Arama yap
+        var searchUrl = `https://www.google.com/search?q=${encodeURIComponent(keyword)}`
+        await driver.get(searchUrl)
+        await delay(3000)
+        
+        // Sıralamayı bul
+        var pageId = await findSiteUrl(driver, url)
+        var currentPage = 1
+        
+        if (pageId == -1) {
+            // İkinci sayfaya bak
+            pageId = await nextPage(driver, url)
+            currentPage = 2
+        }
+        
+        var result = {
+            found: pageId !== -1,
+            position: pageId !== -1 ? (pageId + 1 + ((currentPage - 1) * 10)) : -1,
+            page: currentPage,
+            keyword: keyword,
+            url: url
+        }
+        
+        if (result.found) {
+            log(`[RANKING CHECK] ✅ Bulundu! Pozisyon: ${result.position} (Sayfa ${result.page})`)
+        } else {
+            log(`[RANKING CHECK] ❌ Bulunamadı (ilk 2 sayfada)`)
+        }
+        
+        await driver.quit()
+        return result
+        
+    } catch (err) {
+        log(`[RANKING CHECK] Hata: ${err.message}`)
+        if (driver) {
+            try {
+                await driver.quit()
+            } catch (e) {}
+        }
+        return {
+            found: false,
+            position: -1,
+            page: 1,
+            keyword: keyword,
+            url: url,
+            error: err.message
+        }
+    }
+}
+
 module.exports = { 
     main: main,
     stop: stop,
     setLogCallback: setLogCallback,
     setVisitCallback: setVisitCallback,
+    setRankingCallback: setRankingCallback,
     checkSitemap: checkSitemap,
     start: start,
-    testProxies: testProxies
+    testProxies: testProxies,
+    checkRanking: checkRanking,
+    analyzeSEO: analyzeSEO,
+    pingSearchEngines: pingSearchEngines
 }

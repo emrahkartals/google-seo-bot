@@ -6,7 +6,7 @@
 ![Electron](https://img.shields.io/badge/Electron-Latest-9FEAF9?style=for-the-badge&logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-14.20+-green?style=for-the-badge&logo=node.js)
 ![License](https://img.shields.io/badge/License-ISC-yellow?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.1.0-green?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.2.0-green?style=for-the-badge)
 
 [![GitHub stars](https://img.shields.io/github/stars/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/network/members)
@@ -24,7 +24,14 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 
 > ⚠️ **Önemli**: Bu bot eğitim ve test amaçlıdır. Google'ın hizmet şartlarına uygun kullanın.
 
-## 🆕 Son Güncellemeler (v1.1.0)
+## 🆕 Son Güncellemeler (v1.2.0)
+
+- ✅ **🔑 API Ayarları Menüsü**: Menüden API key'lerinizi ekleyin (OpenAI, Anthropic, Google Gemini)
+- ✅ **AI Destekli SEO Önerileri**: API key'lerle gelişmiş AI önerileri alın
+- ✅ **Güvenli API Key Yönetimi**: API key'ler yerel olarak güvenli şekilde saklanır
+- ✅ **Şifre Göster/Gizle**: API key'lerinizi güvenli şekilde görüntüleyin
+
+### Önceki Güncellemeler (v1.1.0)
 
 - ✅ **Rotating Proxy Düzeltmesi**: Proxy format normalizasyonu ve SOCKS4 filtrelenmesi
 - ✅ **Proxy Test Özelliği**: Proxy'lerin çalışıp çalışmadığını test edin
@@ -50,6 +57,8 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 - **🔍 SEO Analiz Sayfası**: Detaylı SEO analizi yapar (Meta tags, Headings, Images, Links, Technical SEO)
 - **📊 Google Sıralama Takibi**: Google'da sıralama pozisyonunuzu otomatik kaydeder ve takip eder
 - **🤖 Arama Motoru Botlarını Tetikleme**: Google ve Bing'e sitemap ping yaparak botları bilgilendirir
+- **🔑 API Ayarları**: Menüden API key'lerinizi ekleyin (OpenAI, Anthropic, Google Gemini)
+- **🤖 AI Destekli SEO Önerileri**: API key'lerle gelişmiş AI önerileri alın (opsiyonel)
 
 ### ⚙️ Gelişmiş Özellikler
 - **🔄 Rotating Proxy Desteği**: Otomatik proxy rotasyonu ile farklı IP adreslerinden trafik gönderir
@@ -144,10 +153,18 @@ npm start
 
 #### Adım 3: Ek Özellikler (Opsiyonel)
 
+**API Ayarları (Yeni!):**
+- Menüden "Ayarlar" > "API Ayarları" seçin (veya `Ctrl+,` kısayolu)
+- OpenAI, Anthropic veya Google Gemini API key'lerinizi ekleyin
+- API key'ler yerel olarak güvenli şekilde saklanır
+- API key'ler opsiyoneldir - eklemezseniz kural tabanlı öneri sistemi kullanılır
+- API key eklerseniz, SEO analizinde daha gelişmiş AI destekli öneriler alırsınız
+
 **SEO Analizi:**
 - "SEO Analizi" butonuna tıklayın
 - Detaylı SEO raporu modal'da görüntülenir
 - SEO skoru (0-100) ve tüm kriterler kontrol edilir
+- AI destekli öneriler (API key eklendiyse) veya kural tabanlı öneriler gösterilir
 
 **Proxy Test:**
 - "Proxy Test Et" butonuna tıklayın
@@ -359,6 +376,47 @@ Sitenin detaylı SEO analizini yapar ve rapor döndürür.
 ### `pingSearchEngines(url)`
 
 Arama motoru botlarını (Google, Bing) tetiklemek için sitemap ping yapar.
+
+## 🔑 API Ayarları
+
+### API Key Yönetimi
+
+Uygulama, AI destekli SEO önerileri için API key desteği sunar. API key'ler opsiyoneldir ve yerel olarak güvenli şekilde saklanır.
+
+#### Desteklenen API'ler
+
+1. **OpenAI API**
+   - API key almak için: [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+   - Format: `sk-...`
+
+2. **Anthropic (Claude) API**
+   - API key almak için: [console.anthropic.com](https://console.anthropic.com/)
+   - Format: `sk-ant-...`
+
+3. **Google Gemini API**
+   - API key almak için: [makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+   - Format: `AIza...`
+
+#### API Key Ekleme
+
+1. Menüden "Ayarlar" > "API Ayarları" seçin (veya `Ctrl+,` kısayolu)
+2. İstediğiniz API key'leri girin
+3. "Kaydet" butonuna tıklayın
+4. API key'ler yerel olarak saklanır
+
+#### API Key Kullanımı
+
+- **API key olmadan**: Kural tabanlı akıllı öneri sistemi kullanılır
+- **API key ile**: Daha gelişmiş AI destekli öneriler alırsınız
+- API key'ler sadece SEO analizi sırasında kullanılır
+- API key'ler hiçbir yere gönderilmez, sadece yerel olarak saklanır
+
+#### Güvenlik
+
+- ✅ API key'ler yerel olarak saklanır (localStorage)
+- ✅ Şifre alanları varsayılan olarak gizlidir
+- ✅ Göster/gizle özelliği ile kontrol edebilirsiniz
+- ✅ API key'ler hiçbir sunucuya gönderilmez
 
 ## 🌍 Çoklu Dil Desteği
 

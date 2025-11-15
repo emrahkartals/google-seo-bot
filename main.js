@@ -66,6 +66,20 @@ function createMenu() {
             ]
         },
         {
+            label: 'Ayarlar',
+            submenu: [
+                {
+                    label: 'API Ayarları',
+                    accelerator: 'CmdOrCtrl+,',
+                    click: () => {
+                        if (mainWindow && !mainWindow.isDestroyed()) {
+                            mainWindow.webContents.send('menu-open-settings');
+                        }
+                    }
+                }
+            ]
+        },
+        {
             label: 'Görünüm',
             submenu: [
                 {
@@ -199,6 +213,13 @@ bot.setVisitCallback((visit) => {
     }
 });
 
+// Bot ranking callback
+bot.setRankingCallback((ranking) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('ranking-recorded', ranking);
+    }
+});
+
 // IPC Handlers
 ipcMain.handle('start-bot', async (event, config) => {
     if (isRunning) {
@@ -251,6 +272,33 @@ ipcMain.handle('get-bot-status', () => {
 ipcMain.handle('test-proxies', async () => {
     try {
         const results = await bot.testProxies();
+        return { success: true, results: results };
+    } catch (error) {
+        return { success: false, message: error.message, results: null };
+    }
+});
+
+ipcMain.handle('check-ranking', async (event, url, keyword) => {
+    try {
+        const result = await bot.checkRanking(url, keyword);
+        return { success: true, result: result };
+    } catch (error) {
+        return { success: false, message: error.message, result: null };
+    }
+});
+
+ipcMain.handle('analyze-seo', async (event, url) => {
+    try {
+        const analysis = await bot.analyzeSEO(url);
+        return { success: true, analysis: analysis };
+    } catch (error) {
+        return { success: false, message: error.message, analysis: null };
+    }
+});
+
+ipcMain.handle('ping-search-engines', async (event, url) => {
+    try {
+        const results = await bot.pingSearchEngines(url);
         return { success: true, results: results };
     } catch (error) {
         return { success: false, message: error.message, results: null };

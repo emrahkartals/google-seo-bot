@@ -8,6 +8,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     checkSitemap: (url) => ipcRenderer.invoke('check-sitemap', url),
     getBotStatus: () => ipcRenderer.invoke('get-bot-status'),
     testProxies: () => ipcRenderer.invoke('test-proxies'),
+    checkRanking: (url, keyword) => ipcRenderer.invoke('check-ranking', url, keyword),
+    analyzeSEO: (url) => ipcRenderer.invoke('analyze-seo', url),
+    pingSearchEngines: (url) => ipcRenderer.invoke('ping-search-engines', url),
     
     // Event listeners
     onLogMessage: (callback) => {
@@ -15,6 +18,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     onVisitRecorded: (callback) => {
         ipcRenderer.on('visit-recorded', (event, visit) => callback(visit));
+    },
+    onRankingRecorded: (callback) => {
+        ipcRenderer.on('ranking-recorded', (event, ranking) => callback(ranking));
     },
     
     // Menu event listeners
@@ -29,6 +35,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     onMenuAbout: (callback) => {
         ipcRenderer.on('menu-about', () => callback());
+    },
+    onMenuOpenSettings: (callback) => {
+        ipcRenderer.on('menu-open-settings', () => callback());
     },
     
     // Cleanup

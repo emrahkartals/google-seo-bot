@@ -17,7 +17,24 @@ const startBtn = document.getElementById('start-btn');
 const stopBtn = document.getElementById('stop-btn');
 const checkSitemapBtn = document.getElementById('check-sitemap-btn');
 const testProxyBtn = document.getElementById('test-proxy-btn');
+const analyzeSeoBtn = document.getElementById('analyze-seo-btn');
+const pingBotsBtn = document.getElementById('ping-bots-btn');
 const clearLogsBtn = document.getElementById('clear-logs-btn');
+const seoModal = document.getElementById('seo-modal');
+const seoModalClose = document.getElementById('seo-modal-close');
+const seoLoading = document.getElementById('seo-loading');
+const seoResults = document.getElementById('seo-results');
+const apiSettingsModal = document.getElementById('api-settings-modal');
+const apiSettingsModalClose = document.getElementById('api-settings-modal-close');
+const openaiApiKeyInput = document.getElementById('openai-api-key');
+const anthropicApiKeyInput = document.getElementById('anthropic-api-key');
+const googleApiKeyInput = document.getElementById('google-api-key');
+const saveApiKeysBtn = document.getElementById('save-api-keys-btn');
+const clearApiKeysBtn = document.getElementById('clear-api-keys-btn');
+const cancelApiSettingsBtn = document.getElementById('cancel-api-settings-btn');
+const toggleOpenaiVisibility = document.getElementById('toggle-openai-visibility');
+const toggleAnthropicVisibility = document.getElementById('toggle-anthropic-visibility');
+const toggleGoogleVisibility = document.getElementById('toggle-google-visibility');
 const chartTypeBtn = document.getElementById('chart-type-btn');
 const resetChartBtn = document.getElementById('reset-chart-btn');
 
@@ -73,7 +90,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     stopBtn.addEventListener('click', handleStop);
     checkSitemapBtn.addEventListener('click', handleCheckSitemap);
     testProxyBtn.addEventListener('click', handleTestProxy);
+    analyzeSeoBtn.addEventListener('click', handleAnalyzeSEO);
+    pingBotsBtn.addEventListener('click', handlePingBots);
     clearLogsBtn.addEventListener('click', clearLogs);
+    
+    // SEO Modal close
+    seoModalClose.addEventListener('click', () => {
+        seoModal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (e) => {
+        if (e.target === seoModal) {
+            seoModal.style.display = 'none';
+        }
+        if (e.target === apiSettingsModal) {
+            apiSettingsModal.style.display = 'none';
+        }
+    });
+    
+    // API Settings Modal
+    apiSettingsModalClose.addEventListener('click', () => {
+        apiSettingsModal.style.display = 'none';
+    });
+    
+    saveApiKeysBtn.addEventListener('click', handleSaveApiKeys);
+    clearApiKeysBtn.addEventListener('click', handleClearApiKeys);
+    cancelApiSettingsBtn.addEventListener('click', () => {
+        apiSettingsModal.style.display = 'none';
+    });
+    
+    // Toggle visibility buttons
+    toggleOpenaiVisibility.addEventListener('click', () => {
+        togglePasswordVisibility(openaiApiKeyInput, toggleOpenaiVisibility);
+    });
+    toggleAnthropicVisibility.addEventListener('click', () => {
+        togglePasswordVisibility(anthropicApiKeyInput, toggleAnthropicVisibility);
+    });
+    toggleGoogleVisibility.addEventListener('click', () => {
+        togglePasswordVisibility(googleApiKeyInput, toggleGoogleVisibility);
+    });
     chartTypeBtn.addEventListener('click', toggleChartType);
     resetChartBtn.addEventListener('click', resetChart);
     
@@ -108,6 +163,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             showAboutDialog();
         });
         
+        window.electronAPI.onMenuOpenSettings(() => {
+            openApiSettings();
+        });
+        
         window.electronAPI.onLogMessage((message) => {
             addLog(message);
         });
@@ -136,6 +195,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (error) {
                 console.error('Visit callback error:', error);
                 addLog(t('messages.visitError', {error: error.message}), 'error');
+            }
+        });
+        
+        window.electronAPI.onRankingRecorded((ranking) => {
+            try {
+                // Sıralama kaydı alındı - log'a ekle
+                if (ranking.position > 0) {
+                    addLog(`📊 Sıralama: "${ranking.keyword}" - Pozisyon ${ranking.position} (Sayfa ${ranking.page})`, 'success');
+                } else {
+                    addLog(`📊 Sıralama: "${ranking.keyword}" - Bulunamadı (ilk ${ranking.page} sayfada)`, 'warning');
+                }
+            } catch (e) {
+                console.error('Ranking record error:', e);
             }
         });
         
@@ -417,6 +489,363 @@ async function handleTestProxy() {
     }
 }
 
+async function handleCheckRanking() {
+    let url = urlInput.value.trim();
+    let keywords = searchKeywordsTextarea.value.trim();
+    
+    if (!url) {
+        addLog(t('messages.urlRequired'), 'error');
+        urlInput.focus();
+        return;
+    }
+    
+    if (!keywords) {
+        addLog(t('messages.keywordsRequired'), 'error');
+        searchKeywordsTextarea.focus();
+        return;
+    }
+    
+    // Normalize URL
+    url = normalizeUrl(url);
+    urlInput.value = url;
+    
+    if (!isValidUrl(url)) {
+        addLog(t('messages.invalidUrl'), 'error');
+        return;
+    }
+    
+    // İlk keyword'ü al
+    const keywordList = keywords.split(',').map(k => k.trim()).filter(k => k.length > 0);
+    if (keywordList.length === 0) {
+        addLog(t('messages.keywordsRequired'), 'error');
+        return;
+    }
+    
+    const keyword = keywordList[0]; // İlk keyword'ü kullan
+    
+    if (window.electronAPI) {
+        checkRankingBtn.disabled = true;
+        addLog(t('messages.rankingCheckStarting', {keyword: keyword, url: url}), '');
+        
+        try {
+            const result = await window.electronAPI.checkRanking(url, keyword);
+            checkRankingBtn.disabled = false;
+            
+            if (result.success && result.result) {
+                const r = result.result;
+                if (r.found) {
+                    addLog(t('messages.rankingCheckFound', {position: r.position, page: r.page, keyword: keyword}), 'success');
+                } else {
+                    addLog(t('messages.rankingCheckNotFound', {keyword: keyword}), 'warning');
+                }
+            } else {
+                addLog(t('messages.rankingCheckError', {error: result.message || 'Unknown error'}), 'error');
+            }
+        } catch (error) {
+            checkRankingBtn.disabled = false;
+            addLog(t('messages.rankingCheckError', {error: error.message}), 'error');
+        }
+    }
+}
+
+async function handleAnalyzeSEO() {
+    let url = urlInput.value.trim();
+    
+    if (!url) {
+        addLog(t('messages.urlRequired'), 'error');
+        urlInput.focus();
+        return;
+    }
+    
+    // Normalize URL
+    url = normalizeUrl(url);
+    urlInput.value = url;
+    
+    if (!isValidUrl(url)) {
+        addLog(t('messages.invalidUrl'), 'error');
+        return;
+    }
+    
+    if (window.electronAPI) {
+        analyzeSeoBtn.disabled = true;
+        seoModal.style.display = 'block';
+        seoLoading.style.display = 'block';
+        seoResults.style.display = 'none';
+        seoResults.innerHTML = '';
+        
+        addLog(t('messages.seoAnalysisStarting', {url: url}), '');
+        
+        try {
+            const result = await window.electronAPI.analyzeSEO(url);
+            analyzeSeoBtn.disabled = false;
+            
+            if (result.success && result.analysis) {
+                displaySEOAnalysis(result.analysis);
+                addLog(t('messages.seoAnalysisCompleted'), 'success');
+            } else {
+                seoLoading.innerHTML = `<p style="color: #f44336;">${t('messages.seoAnalysisError', {error: result.message || 'Unknown error'})}</p>`;
+                addLog(t('messages.seoAnalysisError', {error: result.message || 'Unknown error'}), 'error');
+            }
+        } catch (error) {
+            analyzeSeoBtn.disabled = false;
+            seoLoading.innerHTML = `<p style="color: #f44336;">${t('messages.seoAnalysisError', {error: error.message})}</p>`;
+            addLog(t('messages.seoAnalysisError', {error: error.message}), 'error');
+        }
+    }
+}
+
+function displaySEOAnalysis(analysis) {
+    seoLoading.style.display = 'none';
+    seoResults.style.display = 'block';
+    
+    const score = analysis.score || 0;
+    const scoreColor = score >= 80 ? '#4caf50' : score >= 60 ? '#ff9800' : '#f44336';
+    const scoreLabel = score >= 80 ? 'Mükemmel' : score >= 60 ? 'İyi' : 'İyileştirilebilir';
+    
+    let html = `
+        <div class="seo-score" style="background: linear-gradient(135deg, ${scoreColor} 0%, ${scoreColor}dd 100%);">
+            <div class="seo-score-label">SEO Skoru</div>
+            <div class="seo-score-number">${score}</div>
+            <div class="seo-score-label">${scoreLabel}</div>
+        </div>
+    `;
+    
+    // Meta Tags
+    const meta = analysis.checks.metaTags || {};
+    html += `
+        <div class="seo-section">
+            <h3>📝 Meta Tags</h3>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Title</span>
+                <span class="seo-check-status ${meta.titleGood ? 'good' : 'bad'}">${meta.titleGood ? '✓ İyi' : '✗ İyileştir'}</span>
+            </div>
+            <div class="seo-detail"><strong>Uzunluk:</strong> ${meta.titleLength} karakter (Önerilen: 30-60)</div>
+            <div class="seo-detail"><strong>İçerik:</strong> ${meta.title || 'Yok'}</div>
+            
+            <div class="seo-check-item">
+                <span class="seo-check-label">Description</span>
+                <span class="seo-check-status ${meta.descriptionGood ? 'good' : 'bad'}">${meta.descriptionGood ? '✓ İyi' : '✗ İyileştir'}</span>
+            </div>
+            <div class="seo-detail"><strong>Uzunluk:</strong> ${meta.descriptionLength} karakter (Önerilen: 120-160)</div>
+            <div class="seo-detail"><strong>İçerik:</strong> ${meta.description || 'Yok'}</div>
+            
+            ${meta.ogTitle ? `<div class="seo-check-item"><span class="seo-check-label">Open Graph Title</span><span class="seo-check-status good">✓ Var</span></div>` : ''}
+            ${meta.ogImage ? `<div class="seo-check-item"><span class="seo-check-label">Open Graph Image</span><span class="seo-check-status good">✓ Var</span></div>` : ''}
+        </div>
+    `;
+    
+    // Headings
+    const headings = analysis.checks.headings || {};
+    html += `
+        <div class="seo-section">
+            <h3>📑 Heading Tags</h3>
+            <div class="seo-check-item">
+                <span class="seo-check-label">H1 Sayısı</span>
+                <span class="seo-check-status ${headings.h1Good ? 'good' : 'bad'}">${headings.h1Count} (Önerilen: 1)</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">H2 Sayısı</span>
+                <span class="seo-check-value">${headings.h2Count}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">H3 Sayısı</span>
+                <span class="seo-check-value">${headings.h3Count}</span>
+            </div>
+        </div>
+    `;
+    
+    // Images
+    const images = analysis.checks.images || {};
+    html += `
+        <div class="seo-section">
+            <h3>🖼️ Images</h3>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Toplam Resim</span>
+                <span class="seo-check-value">${images.total}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Alt Tag Yüzdesi</span>
+                <span class="seo-check-status ${images.altPercentage >= 80 ? 'good' : 'warning'}">${images.altPercentage}%</span>
+            </div>
+            <div class="seo-detail"><strong>Alt tag'li:</strong> ${images.withAlt} | <strong>Alt tag'siz:</strong> ${images.withoutAlt}</div>
+        </div>
+    `;
+    
+    // Links
+    const links = analysis.checks.links || {};
+    html += `
+        <div class="seo-section">
+            <h3>🔗 Links</h3>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Toplam Link</span>
+                <span class="seo-check-value">${links.total}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Internal</span>
+                <span class="seo-check-value">${links.internal}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">External</span>
+                <span class="seo-check-value">${links.external}</span>
+            </div>
+        </div>
+    `;
+    
+    // Content
+    const content = analysis.checks.content || {};
+    html += `
+        <div class="seo-section">
+            <h3>📄 İçerik</h3>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Kelime Sayısı</span>
+                <span class="seo-check-status ${content.wordCountGood ? 'good' : 'warning'}">${content.wordCount} (Önerilen: 300+)</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Karakter Sayısı</span>
+                <span class="seo-check-value">${content.charCount}</span>
+            </div>
+        </div>
+    `;
+    
+    // Technical
+    html += `
+        <div class="seo-section">
+            <h3>⚙️ Teknik SEO</h3>
+            <div class="seo-check-item">
+                <span class="seo-check-label">HTTPS</span>
+                <span class="seo-check-status ${analysis.checks.ssl?.secure ? 'good' : 'bad'}">${analysis.checks.ssl?.secure ? '✓ Güvenli' : '✗ HTTP'}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Mobile-Friendly</span>
+                <span class="seo-check-status ${analysis.checks.mobile?.hasViewport ? 'good' : 'bad'}">${analysis.checks.mobile?.hasViewport ? '✓ Var' : '✗ Yok'}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Schema Markup</span>
+                <span class="seo-check-status ${analysis.checks.schema?.hasSchema ? 'good' : 'warning'}">${analysis.checks.schema?.hasSchema ? `✓ ${analysis.checks.schema.schemaCount} adet` : '✗ Yok'}</span>
+            </div>
+            <div class="seo-check-item">
+                <span class="seo-check-label">Sayfa Yükleme Süresi</span>
+                <span class="seo-check-status ${analysis.loadTime < 3000 ? 'good' : 'warning'}">${Math.round(analysis.loadTime / 1000)}s</span>
+            </div>
+            ${analysis.checks.sitemap ? `
+            <div class="seo-check-item">
+                <span class="seo-check-label">Sitemap</span>
+                <span class="seo-check-status ${analysis.checks.sitemap.found ? 'good' : 'bad'}">${analysis.checks.sitemap.found ? '✓ Bulundu' : '✗ Bulunamadı'}</span>
+            </div>
+            ` : ''}
+            ${analysis.checks.robotsTxt ? `
+            <div class="seo-check-item">
+                <span class="seo-check-label">Robots.txt</span>
+                <span class="seo-check-status ${analysis.checks.robotsTxt.found ? 'good' : 'warning'}">${analysis.checks.robotsTxt.found ? '✓ Var' : '⚠ Yok'}</span>
+            </div>
+            ` : ''}
+        </div>
+    `;
+    
+    // AI Destekli Öneriler
+    if (analysis.recommendations && analysis.recommendations.length > 0) {
+        html += `
+            <div class="seo-section" style="border-left-color: #667eea; background: #f0f4ff;">
+                <h3>🤖 AI Destekli SEO Önerileri</h3>
+                <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Analiz sonuçlarına göre özelleştirilmiş öneriler:</p>
+        `;
+        
+        analysis.recommendations.forEach((rec, index) => {
+            var priorityColor = rec.priority === 'high' ? '#f44336' : rec.priority === 'medium' ? '#ff9800' : '#4caf50';
+            var priorityLabel = rec.priority === 'high' ? 'Yüksek Öncelik' : rec.priority === 'medium' ? 'Orta Öncelik' : 'Düşük Öncelik';
+            
+            html += `
+                <div class="seo-recommendation" style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid ${priorityColor};">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-weight: 600; color: #333; margin-bottom: 5px;">${index + 1}. ${rec.issue}</div>
+                            <div style="font-size: 12px; color: ${priorityColor}; font-weight: 600;">${priorityLabel}</div>
+                        </div>
+                        <span style="font-size: 12px; color: #666; background: #f5f5f5; padding: 4px 8px; border-radius: 4px;">${rec.category}</span>
+                    </div>
+                    <div style="color: #555; margin-bottom: 10px; line-height: 1.6;">${rec.recommendation}</div>
+                    ${rec.example ? `
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 12px; color: #333;">
+                        <strong>Örnek:</strong><br>${rec.example.replace(/\n/g, '<br>')}
+                    </div>
+                    ` : ''}
+                    <div style="margin-top: 10px; font-size: 12px; color: #667eea;">
+                        <strong>Etki:</strong> ${rec.impact}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+    }
+    
+    seoResults.innerHTML = html;
+}
+
+async function handlePingBots() {
+    let url = urlInput.value.trim();
+    
+    if (!url) {
+        addLog(t('messages.urlRequired'), 'error');
+        urlInput.focus();
+        return;
+    }
+    
+    // Normalize URL
+    url = normalizeUrl(url);
+    urlInput.value = url;
+    
+    if (!isValidUrl(url)) {
+        addLog(t('messages.invalidUrl'), 'error');
+        return;
+    }
+    
+    if (window.electronAPI) {
+        pingBotsBtn.disabled = true;
+        addLog(t('messages.pingBotsStarting', {url: url}), '');
+        
+        try {
+            const result = await window.electronAPI.pingSearchEngines(url);
+            pingBotsBtn.disabled = false;
+            
+            if (result.success && result.results) {
+                const r = result.results;
+                addLog(t('messages.pingBotsCompleted'), 'success');
+                
+                // Ping sonuçlarını göster
+                if (r.pings.googleSitemap) {
+                    if (r.pings.googleSitemap.success) {
+                        addLog(`✅ Google: ${r.pings.googleSitemap.message}`, 'success');
+                    } else {
+                        addLog(`⚠️ Google: ${r.pings.googleSitemap.message}`, 'warning');
+                    }
+                }
+                
+                if (r.pings.bingSitemap) {
+                    if (r.pings.bingSitemap.success) {
+                        addLog(`✅ Bing: ${r.pings.bingSitemap.message}`, 'success');
+                    } else {
+                        addLog(`⚠️ Bing: ${r.pings.bingSitemap.message}`, 'warning');
+                    }
+                }
+                
+                if (r.errors && r.errors.length > 0) {
+                    r.errors.forEach(err => {
+                        addLog(`⚠️ ${err}`, 'warning');
+                    });
+                }
+                
+                addLog(t('messages.pingBotsNote'), '');
+            } else {
+                addLog(t('messages.pingBotsError', {error: result.message || 'Unknown error'}), 'error');
+            }
+        } catch (error) {
+            pingBotsBtn.disabled = false;
+            addLog(t('messages.pingBotsError', {error: error.message}), 'error');
+        }
+    }
+}
+
 // Add Log
 function addLog(message, type = '') {
     // Remove placeholder
@@ -479,6 +908,86 @@ function showAboutDialog() {
     const version = '1.0.0';
     const message = `Google SEO Bot v${version}\n\nOrganik trafik simülasyonu ile SEO sıralamanızı yükseltin.\n\nGitHub: https://github.com/emrahkartals/google-seo-bot\n\n© 2024 emrahkartals`;
     alert(message);
+}
+
+// API Settings Functions
+function openApiSettings() {
+    // Load saved API keys
+    const openaiKey = localStorage.getItem('openai_api_key') || '';
+    const anthropicKey = localStorage.getItem('anthropic_api_key') || '';
+    const googleKey = localStorage.getItem('google_api_key') || '';
+    
+    openaiApiKeyInput.value = openaiKey;
+    anthropicApiKeyInput.value = anthropicKey;
+    googleApiKeyInput.value = googleKey;
+    
+    // Reset visibility toggles
+    openaiApiKeyInput.type = 'password';
+    anthropicApiKeyInput.type = 'password';
+    googleApiKeyInput.type = 'password';
+    
+    apiSettingsModal.style.display = 'flex';
+}
+
+function handleSaveApiKeys() {
+    const openaiKey = openaiApiKeyInput.value.trim();
+    const anthropicKey = anthropicApiKeyInput.value.trim();
+    const googleKey = googleApiKeyInput.value.trim();
+    
+    // Save to localStorage
+    if (openaiKey) {
+        localStorage.setItem('openai_api_key', openaiKey);
+    } else {
+        localStorage.removeItem('openai_api_key');
+    }
+    
+    if (anthropicKey) {
+        localStorage.setItem('anthropic_api_key', anthropicKey);
+    } else {
+        localStorage.removeItem('anthropic_api_key');
+    }
+    
+    if (googleKey) {
+        localStorage.setItem('google_api_key', googleKey);
+    } else {
+        localStorage.removeItem('google_api_key');
+    }
+    
+    addLog(t('messages.apiKeysSaved') || '✅ API key\'ler kaydedildi!', 'success');
+    apiSettingsModal.style.display = 'none';
+}
+
+function handleClearApiKeys() {
+    if (confirm(t('messages.apiKeysClearConfirm') || 'Tüm API key\'leri temizlemek istediğinize emin misiniz?')) {
+        localStorage.removeItem('openai_api_key');
+        localStorage.removeItem('anthropic_api_key');
+        localStorage.removeItem('google_api_key');
+        
+        openaiApiKeyInput.value = '';
+        anthropicApiKeyInput.value = '';
+        googleApiKeyInput.value = '';
+        
+        addLog(t('messages.apiKeysCleared') || '✅ API key\'ler temizlendi!', 'success');
+    }
+}
+
+function togglePasswordVisibility(input, button) {
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+    }
+}
+
+// Get API keys (for use in other functions)
+function getApiKeys() {
+    return {
+        openai: localStorage.getItem('openai_api_key') || null,
+        anthropic: localStorage.getItem('anthropic_api_key') || null,
+        google: localStorage.getItem('google_api_key') || null
+    };
 }
 
 // Clear Logs

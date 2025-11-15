@@ -31,6 +31,8 @@
   "buttons": {
     "checkSitemap": "Sitemap Kontrol Et",
     "testProxy": "Proxy Test Et",
+    "analyzeSEO": "SEO Analizi",
+    "pingBots": "Botları Tetikle",
     "start": "Başlat",
     "stop": "Durdur",
     "clear": "Temizle",
@@ -74,7 +76,39 @@
     "proxyTestNotWorking": "Çalışmayan Proxy",
     "proxyTestUnsupported": "Desteklenmeyen Proxy",
     "proxyTestWorkingList": "Çalışan Proxy Listesi",
-    "proxyTestError": "❌ Proxy test hatası: {error}"
+    "proxyTestError": "❌ Proxy test hatası: {error}",
+    "rankingCheckStarting": "🔍 Sıralama kontrol ediliyor: \"{keyword}\" için {url}...",
+    "rankingCheckFound": "✅ Sıralama bulundu! \"{keyword}\" - Pozisyon {position} (Sayfa {page})",
+    "rankingCheckNotFound": "⚠️ Sıralama bulunamadı: \"{keyword}\" (ilk 2 sayfada)",
+    "rankingCheckError": "❌ Sıralama kontrol hatası: {error}",
+    "seoAnalysisStarting": "🔍 SEO analizi başlatılıyor: {url}...",
+    "seoAnalysisCompleted": "✅ SEO analizi tamamlandı!",
+    "seoAnalysisError": "❌ SEO analiz hatası: {error}",
+    "pingBotsStarting": "🤖 Arama motoru botları tetikleniyor: {url}...",
+    "pingBotsCompleted": "✅ Bot ping işlemi tamamlandı!",
+    "pingBotsError": "❌ Bot ping hatası: {error}",
+    "pingBotsNote": "💡 Not: Botların siteyi ziyaret etmesi birkaç saat veya gün sürebilir. Ping işlemi sadece botları bilgilendirir.",
+    "apiKeysSaved": "✅ API key'ler kaydedildi!",
+    "apiKeysCleared": "✅ API key'ler temizlendi!",
+    "apiKeysClearConfirm": "Tüm API key'leri temizlemek istediğinize emin misiniz?"
+  },
+  "apiSettings": {
+    "title": "🔑 API Ayarları",
+    "description": "AI destekli SEO önerileri için API key'lerinizi ekleyin. API key'ler yerel olarak saklanır ve güvenlidir.",
+    "openaiKey": "OpenAI API Key",
+    "openaiKeyDesc": "OpenAI API key'inizi <a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">buradan</a> alabilirsiniz",
+    "anthropicKey": "Anthropic (Claude) API Key",
+    "anthropicKeyDesc": "Anthropic API key'inizi <a href=\"https://console.anthropic.com/\" target=\"_blank\">buradan</a> alabilirsiniz",
+    "googleKey": "Google Gemini API Key",
+    "googleKeyDesc": "Google Gemini API key'inizi <a href=\"https://makersuite.google.com/app/apikey\" target=\"_blank\">buradan</a> alabilirsiniz",
+    "info": "💡 <strong>Not:</strong> API key'ler opsiyoneldir. API key eklemezseniz, kural tabanlı akıllı öneri sistemi kullanılır. API key eklerseniz, daha gelişmiş AI destekli öneriler alırsınız.",
+    "save": "Kaydet",
+    "clear": "Temizle",
+    "cancel": "İptal"
+  },
+  "seo": {
+    "title": "🔍 SEO Analiz Raporu",
+    "analyzing": "Analiz yapılıyor, lütfen bekleyin..."
   },
   "searchEngines": {
     "google": "Google",

@@ -31,6 +31,8 @@
   "buttons": {
     "checkSitemap": "Check Sitemap",
     "testProxy": "Test Proxy",
+    "analyzeSEO": "SEO Analysis",
+    "pingBots": "Ping Search Bots",
     "start": "Start",
     "stop": "Stop",
     "clear": "Clear",
@@ -74,7 +76,39 @@
     "proxyTestNotWorking": "Not Working Proxies",
     "proxyTestUnsupported": "Unsupported Proxies",
     "proxyTestWorkingList": "Working Proxy List",
-    "proxyTestError": "❌ Proxy test error: {error}"
+    "proxyTestError": "❌ Proxy test error: {error}",
+    "rankingCheckStarting": "🔍 Checking ranking: {url} for \"{keyword}\"...",
+    "rankingCheckFound": "✅ Ranking found! \"{keyword}\" - Position {position} (Page {page})",
+    "rankingCheckNotFound": "⚠️ Ranking not found: \"{keyword}\" (first 2 pages)",
+    "rankingCheckError": "❌ Ranking check error: {error}",
+    "seoAnalysisStarting": "🔍 Starting SEO analysis: {url}...",
+    "seoAnalysisCompleted": "✅ SEO analysis completed!",
+    "seoAnalysisError": "❌ SEO analysis error: {error}",
+    "pingBotsStarting": "🤖 Triggering search engine bots: {url}...",
+    "pingBotsCompleted": "✅ Bot ping completed!",
+    "pingBotsError": "❌ Bot ping error: {error}",
+    "pingBotsNote": "💡 Note: It may take hours or days for bots to visit your site. Ping only notifies the bots.",
+    "apiKeysSaved": "✅ API keys saved!",
+    "apiKeysCleared": "✅ API keys cleared!",
+    "apiKeysClearConfirm": "Are you sure you want to clear all API keys?"
+  },
+  "apiSettings": {
+    "title": "🔑 API Settings",
+    "description": "Add your API keys for AI-powered SEO recommendations. API keys are stored locally and securely.",
+    "openaiKey": "OpenAI API Key",
+    "openaiKeyDesc": "You can get your OpenAI API key <a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">here</a>",
+    "anthropicKey": "Anthropic (Claude) API Key",
+    "anthropicKeyDesc": "You can get your Anthropic API key <a href=\"https://console.anthropic.com/\" target=\"_blank\">here</a>",
+    "googleKey": "Google Gemini API Key",
+    "googleKeyDesc": "You can get your Google Gemini API key <a href=\"https://makersuite.google.com/app/apikey\" target=\"_blank\">here</a>",
+    "info": "💡 <strong>Note:</strong> API keys are optional. If you don't add API keys, the rule-based intelligent recommendation system will be used. If you add API keys, you'll get more advanced AI-powered recommendations.",
+    "save": "Save",
+    "clear": "Clear",
+    "cancel": "Cancel"
+  },
+  "seo": {
+    "title": "🔍 SEO Analysis Report",
+    "analyzing": "Analyzing, please wait..."
   },
   "searchEngines": {
     "google": "Google",
