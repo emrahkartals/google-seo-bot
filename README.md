@@ -6,6 +6,11 @@
 ![Electron](https://img.shields.io/badge/Electron-Latest-9FEAF9?style=for-the-badge&logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-14.20+-green?style=for-the-badge&logo=node.js)
 ![License](https://img.shields.io/badge/License-ISC-yellow?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.1.0-green?style=for-the-badge)
+
+[![GitHub stars](https://img.shields.io/github/stars/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/emrahkartals/google-seo-bot)](https://github.com/emrahkartals/google-seo-bot/issues)
 
 **Organik trafik simülasyonu ile SEO sıralamanızı yükseltin**
 
