@@ -26,7 +26,9 @@
     "pageMaxTime": "Sayfa Max Süre (sn)",
     "totalMinTime": "Toplam Min Süre (dk)",
     "totalMaxTime": "Toplam Max Süre (dk)",
-    "pageCount": "Gezilecek Sayfa Sayısı"
+    "pageCount": "Gezilecek Sayfa Sayısı",
+    "headlessMode": "🔒 Gizli Mod (Chrome pencerelerini gizle)",
+    "headlessModeDesc": "Aktif edildiğinde Chrome pencereleri görünmez olacak"
   },
   "buttons": {
     "checkSitemap": "Sitemap Kontrol Et",

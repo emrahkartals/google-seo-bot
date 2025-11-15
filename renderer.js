@@ -12,6 +12,7 @@ const pageMaxTimeInput = document.getElementById('page-max-time');
 const totalMinTimeInput = document.getElementById('total-min-time');
 const totalMaxTimeInput = document.getElementById('total-max-time');
 const pageCountInput = document.getElementById('page-count');
+const headlessModeInput = document.getElementById('headless-mode');
 
 const startBtn = document.getElementById('start-btn');
 const stopBtn = document.getElementById('stop-btn');
@@ -204,6 +205,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             await loadTranslations(currentLanguage);
             applyTranslations();
             updateChartLabel();
+            // Menüyü güncelle
+            if (window.electronAPI && window.electronAPI.setLanguage) {
+                await window.electronAPI.setLanguage(currentLanguage);
+            }
         });
     }
     
@@ -499,7 +504,8 @@ async function handleStart() {
         totalMaxTime: parseInt(totalMaxTimeInput.value) || 5,
         pageMinTime: parseInt(pageMinTimeInput.value) || 10,
         pageMaxTime: parseInt(pageMaxTimeInput.value) || 30,
-        pageCount: parseInt(pageCountInput.value) || 10
+        pageCount: parseInt(pageCountInput.value) || 10,
+        headlessMode: headlessModeInput ? headlessModeInput.checked : true
     };
     
     // Validate times
@@ -1043,6 +1049,7 @@ function addLog(message, type = '') {
     const localeMap = {
         'tr': 'tr-TR',
         'en': 'en-US',
+        'ar': 'ar-SA',
         'de': 'de-DE',
         'fr': 'fr-FR',
         'ru': 'ru-RU',

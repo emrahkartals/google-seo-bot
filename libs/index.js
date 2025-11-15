@@ -16,6 +16,7 @@ var rankingCallback = null
 var isRunning = false
 var scheduledVisits = []
 var visitInterval = null
+var globalHeadlessMode = true // Varsayılan olarak gizli mod aktif
 
 function log(message) {
     if (logCallback) {
@@ -71,13 +72,19 @@ function recordRanking(url, keyword, position, page, engine) {
 }
 
 const PERMISSIONS = [
-    // "--headless", // Kaldırıldı - pencereler görünür olacak
+    // "--headless", // Kaldırıldı - pencereler görünür olacak (artık addHeadlessIfEnabled ile kontrol ediliyor)
     "--mute-audio",
     "--disable-logging",
     "--disable-infobars",
     "--disable-dev-shm-usage",
 ]
 
+// Headless mode'u koşullu olarak ekle
+function addHeadlessIfEnabled(options) {
+    if (globalHeadlessMode) {
+        options.addArguments('--headless')
+    }
+}
 
 function delay(time){
     return new Promise(resolve => setTimeout(resolve, time));
@@ -667,6 +674,7 @@ async function Direct(url, proxy, minTime, maxTime, useSitemap, countIndex){
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
     
@@ -729,6 +737,7 @@ async function googleSearch(url, keyboard, proxy, minTime, maxTime, alwaysDirect
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     log(`[GOOGLE SEARCH] Başlatılıyor... Arama: "${keyboard}" | URL: ${url} | Proxy: Kapalı (Google için)`)
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
@@ -945,6 +954,7 @@ async function bingSearch(url, keyboard, proxy, minTime, maxTime, alwaysDirect) 
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     logI18n('logMessages.bingStarting', {keyword: keyboard, url: url})
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
@@ -993,6 +1003,7 @@ async function yahooSearch(url, keyboard, proxy, minTime, maxTime, alwaysDirect)
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     logI18n('logMessages.yahooStarting', {keyword: keyboard, url: url})
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
@@ -1040,6 +1051,7 @@ async function duckDuckGoSearch(url, keyboard, proxy, minTime, maxTime, alwaysDi
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     logI18n('logMessages.duckduckgoStarting', {keyword: keyboard, url: url})
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
@@ -1087,6 +1099,7 @@ async function yandexSearch(url, keyboard, proxy, minTime, maxTime, alwaysDirect
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     logI18n('logMessages.yandexStarting', {keyword: keyboard, url: url})
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
@@ -1386,6 +1399,7 @@ async function proxyServer(url, keyboard, minTime, maxTime){
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     log(`[PROXY SERVER] Başlatılıyor... Arama: "${keyboard}" | URL: ${url}`)
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
@@ -1796,16 +1810,14 @@ async function executeDirectVisit(config) {
     var proxylist = await loadproxy()
     var useProxy = false
     
-    // Proxy kullanımını opsiyonel yap - proxy sorunları varsa kullanma
+    // Proxy kullanımı - proxy listesi varsa kullan
     if (proxylist.length > 0) {
-        // %30 ihtimalle proxy kullan (proxy sorunlarını azaltmak için)
-        if (Math.random() < 0.3) {
-            proxy = proxylist[random(0, proxylist.length - 1)]
-            useProxy = true
-            log(`Proxy kullanılıyor: ${proxy}`)
-        } else {
-            log(`Proxy kullanılmıyor (rastgele seçim)`)
-        }
+        // Proxy listesi varsa mutlaka kullan
+        proxy = proxylist[random(0, proxylist.length - 1)]
+        useProxy = true
+        logI18n('logMessages.directProxyUsing', {proxy: proxy})
+    } else {
+        logI18n('logMessages.directProxyNotFound')
     }
     
     var totalTimeMinutes = random(config.totalMinTime, config.totalMaxTime)
@@ -1846,6 +1858,7 @@ async function executeDirectVisit(config) {
     }
     PERMISSIONS.forEach(perms => options.addArguments(perms))
     options.excludeSwitches('enable-logging')
+    addHeadlessIfEnabled(options)
     
     var driver = null
     try {
@@ -1858,6 +1871,7 @@ async function executeDirectVisit(config) {
             options = new chrome.Options()
             PERMISSIONS.forEach(perms => options.addArguments(perms))
             options.excludeSwitches('enable-logging')
+            addHeadlessIfEnabled(options)
             driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
             await Stealth(driver)
         } else {
@@ -1938,7 +1952,11 @@ async function start(config) {
     log(`Başlangıç: ${config.startTime}`)
     log(`Bitiş: ${config.endTime}`)
     log(`Dağılım: ${config.distributionType}`)
+    log(`Gizli Mod: ${config.headlessMode ? 'Aktif' : 'Kapalı'}`)
     log(`========================================`)
+    
+    // Global headless mode ayarını güncelle
+    globalHeadlessMode = config.headlessMode !== undefined ? config.headlessMode : true
     
     scheduleVisits(config)
     startScheduler()

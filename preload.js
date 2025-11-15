@@ -41,6 +41,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('menu-open-settings', () => callback());
     },
     
+    // Language
+    setLanguage: (lang) => ipcRenderer.invoke('set-language', lang),
+    
     // Cleanup
     removeAllListeners: (channel) => {
         ipcRenderer.removeAllListeners(channel);

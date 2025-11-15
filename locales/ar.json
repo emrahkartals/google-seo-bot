@@ -1,0 +1,355 @@
+{
+  "app": {
+    "title": "Google SEO Bot",
+    "subtitle": "عزز ترتيبك في محركات البحث مع محاكاة حركة المرور العضوية"
+  },
+  "status": {
+    "ready": "جاهز",
+    "running": "يعمل",
+    "stopped": "متوقف"
+  },
+  "settings": {
+    "title": "⚙️ الإعدادات",
+    "url": "رابط الموقع *",
+    "visitorCount": "عدد الزوار",
+    "distributionType": "نوع التوزيع",
+    "hourly": "كل ساعة",
+    "daily": "يومي",
+    "newVisitorRate": "نسبة الزوار الجدد (%)",
+    "newVisitorRateDesc": "سيأتي الزوار الجدد من محركات البحث",
+    "searchKeywords": "كلمات البحث (مفصولة بفواصل)",
+    "searchKeywordsPlaceholder": "مثال: كلمة مفتاحية، كلمة مفتاحية أخرى",
+    "searchEngine": "محرك البحث",
+    "startTime": "وقت البداية",
+    "endTime": "وقت النهاية",
+    "pageMinTime": "الحد الأدنى لوقت الصفحة (ثانية)",
+    "pageMaxTime": "الحد الأقصى لوقت الصفحة (ثانية)",
+    "totalMinTime": "الحد الأدنى للوقت الإجمالي (دقيقة)",
+    "totalMaxTime": "الحد الأقصى للوقت الإجمالي (دقيقة)",
+    "pageCount": "عدد الصفحات للزيارة",
+    "headlessMode": "🔒 الوضع المخفي (إخفاء نوافذ Chrome)",
+    "headlessModeDesc": "عند التفعيل، ستكون نوافذ Chrome غير مرئية"
+  },
+  "buttons": {
+    "checkSitemap": "فحص خريطة الموقع",
+    "testProxy": "اختبار البروكسي",
+    "downloadProxy": "تحميل البروكسي",
+    "analyzeSEO": "تحليل SEO",
+    "pingBots": "تفعيل البوتات",
+    "start": "بدء",
+    "stop": "إيقاف",
+    "clear": "مسح",
+    "line": "خط",
+    "bar": "شريط",
+    "reset": "إعادة تعيين"
+  },
+  "chart": {
+    "title": "📈 مخطط الزيارات",
+    "label": "الزيارات"
+  },
+  "logs": {
+    "title": "📊 السجلات",
+    "placeholder": "ستظهر السجلات هنا..."
+  },
+  "stats": {
+    "totalVisits": "إجمالي الزيارات:",
+    "lastVisit": "آخر زيارة:"
+  },
+  "messages": {
+    "urlRequired": "❌ يرجى إدخال رابط!",
+    "invalidUrl": "❌ يرجى إدخال رابط صحيح!",
+    "keywordsRequired": "⚠️ يرجى إدخال كلمة بحث واحدة على الأقل لوضع Google!",
+    "botStarting": "🚀 يتم بدء البوت...",
+    "botStarted": "✅ تم بدء البوت",
+    "botStopping": "⏹️ يتم إيقاف البوت...",
+    "botStopped": "✅ تم إيقاف البوت",
+    "botAlreadyRunning": "البوت يعمل بالفعل!",
+    "sitemapChecking": "🔍 يتم فحص خريطة الموقع: {url}...",
+    "sitemapFound": "✅ تم العثور على خريطة الموقع! تم اكتشاف {count} صفحة.",
+    "sitemapNotFound": "⚠️ لم يتم العثور على خريطة الموقع أو أنها فارغة.",
+    "sitemapError": "❌ خطأ: {error}",
+    "visitRecorded": "✅ تم تسجيل الزيارة: {time}",
+    "visitError": "❌ خطأ في تسجيل الزيارة: {error}",
+    "chartReset": "📊 تم إعادة تعيين المخطط",
+    "invalidTimeRange": "❌ يجب أن يكون وقت النهاية بعد وقت البداية!",
+    "proxyTestStarting": "🔍 يتم بدء اختبار البروكسي...",
+    "proxyTestCompleted": "✅ تم إكمال اختبار البروكسي!",
+    "proxyTestTotal": "إجمالي البروكسي",
+    "proxyTestWorking": "البروكسي العامل",
+    "proxyTestNotWorking": "البروكسي غير العامل",
+    "proxyTestUnsupported": "البروكسي غير المدعوم",
+    "proxyTestWorkingList": "قائمة البروكسي العامل",
+    "proxyTestError": "❌ خطأ في اختبار البروكسي: {error}",
+    "proxyDownloadStarting": "🔍 يتم تحميل قائمة البروكسي...",
+    "proxyDownloadCompleted": "✅ تم تحميل {count} بروكسي وحفظه: {fileName}",
+    "proxyDownloadError": "❌ خطأ في تحميل البروكسي: {error}",
+    "rankingCheckStarting": "🔍 يتم فحص الترتيب: {url} لكلمة \"{keyword}\"...",
+    "rankingCheckFound": "✅ تم العثور على الترتيب! \"{keyword}\" - المركز {position} (الصفحة {page})",
+    "rankingCheckNotFound": "⚠️ لم يتم العثور على الترتيب: \"{keyword}\" (في أول صفحتين)",
+    "rankingCheckError": "❌ خطأ في فحص الترتيب: {error}",
+    "seoAnalysisStarting": "🔍 يتم بدء تحليل SEO: {url}...",
+    "seoAnalysisCompleted": "✅ تم إكمال تحليل SEO!",
+    "seoAnalysisError": "❌ خطأ في تحليل SEO: {error}",
+    "pingBotsStarting": "🤖 يتم تفعيل بوتات محركات البحث: {url}...",
+    "pingBotsCompleted": "✅ تم إكمال عملية ping للبوت!",
+    "pingBotsError": "❌ خطأ في ping البوت: {error}",
+    "pingBotsNote": "💡 ملاحظة: قد تستغرق زيارة البوتات للموقع عدة ساعات أو أيام. عملية ping فقط تخطر البوتات.",
+    "apiKeysSaved": "✅ تم حفظ مفاتيح API!",
+    "apiKeysCleared": "✅ تم مسح مفاتيح API!",
+    "apiKeysClearConfirm": "هل أنت متأكد أنك تريد مسح جميع مفاتيح API؟"
+  },
+  "apiSettings": {
+    "title": "🔑 إعدادات API",
+    "description": "أضف مفاتيح API الخاصة بك لتوصيات SEO المدعومة بالذكاء الاصطناعي. يتم حفظ مفاتيح API محليًا وهي آمنة.",
+    "openaiKey": "مفتاح OpenAI API",
+    "openaiKeyDesc": "يمكنك الحصول على مفتاح OpenAI API <a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">من هنا</a>",
+    "anthropicKey": "مفتاح Anthropic (Claude) API",
+    "anthropicKeyDesc": "يمكنك الحصول على مفتاح Anthropic API <a href=\"https://console.anthropic.com/\" target=\"_blank\">من هنا</a>",
+    "googleKey": "مفتاح Google Gemini API",
+    "googleKeyDesc": "يمكنك الحصول على مفتاح Google Gemini API <a href=\"https://makersuite.google.com/app/apikey\" target=\"_blank\">من هنا</a>",
+    "info": "💡 <strong>ملاحظة:</strong> مفاتيح API اختيارية. إذا لم تقم بإضافة مفاتيح API، سيتم استخدام نظام التوصيات الذكي القائم على القواعد. إذا أضفت مفاتيح API، ستحصل على توصيات أكثر تقدمًا مدعومة بالذكاء الاصطناعي.",
+    "save": "حفظ",
+    "clear": "مسح",
+    "cancel": "إلغاء"
+  },
+  "seo": {
+    "title": "🔍 تقرير تحليل SEO",
+    "analyzing": "جارٍ التحليل، يرجى الانتظار..."
+  },
+  "searchEngines": {
+    "google": "Google",
+    "bing": "Bing",
+    "yahoo": "Yahoo",
+    "duckduckgo": "DuckDuckGo",
+    "yandex": "Yandex",
+    "direct": "انتقال مباشر"
+  },
+  "menu": {
+    "file": "ملف",
+    "reload": "إعادة تحميل",
+    "exit": "خروج",
+    "bot": "البوت",
+    "start": "بدء",
+    "stop": "إيقاف",
+    "checkSitemap": "فحص خريطة الموقع",
+    "settings": "الإعدادات",
+    "apiSettings": "إعدادات API",
+    "view": "عرض",
+    "fullScreen": "ملء الشاشة",
+    "developerTools": "أدوات المطور",
+    "resetZoom": "إعادة تعيين التكبير",
+    "zoomIn": "تكبير",
+    "zoomOut": "تصغير",
+    "help": "مساعدة",
+    "about": "حول",
+    "github": "مستودع GitHub",
+    "documentation": "التوثيق",
+    "services": "الخدمات",
+    "hide": "إخفاء",
+    "hideOthers": "إخفاء الآخرين",
+    "show": "إظهار"
+  },
+  "logMessages": {
+    "processStarting": "بدء العملية...",
+    "mode": "الوضع: {mode}",
+    "total": "الإجمالي: {count} عنصر",
+    "minTime": "الحد الأدنى للوقت: {time} ثانية",
+    "maxTime": "الحد الأقصى للوقت: {time} ثانية",
+    "sitemapMode": "وضع خريطة الموقع: {status}",
+    "sitemapActive": "نشط",
+    "sitemapInactive": "غير نشط",
+    "proxyListLoaded": "تم تحميل قائمة البروكسي: {count} عنصر",
+    "proxyListNotFound": "لم يتم العثور على قائمة البروكسي، المتابعة بدون بروكسي",
+    "directStarting": "[DIRECT] تم بدء العملية | الرابط: {url}",
+    "directCompleted": "[DIRECT] تم إكمال جميع العمليات!",
+    "googleSearchStarting": "[GOOGLE SEARCH] تم بدء العملية | الرابط: {url} | البحث: \"{keyword}\"",
+    "googleSearchCompleted": "[GOOGLE SEARCH] تم إكمال جميع العمليات!",
+    "proxyServerStarting": "[PROXY SERVER] تم بدء العملية | الرابط: {url} | البحث: \"{keyword}\"",
+    "proxyServerCompleted": "[PROXY SERVER] تم إكمال جميع العمليات!",
+    "googleSearchStarting2": "[GOOGLE SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url} | البروكسي: معطل (لـ Google)",
+    "googleConnected": "[GOOGLE SEARCH] تم الاتصال بـ Google، جارٍ تحميل الصفحة...",
+    "googleSearching": "[GOOGLE SEARCH] تم العثور على مربع البحث، جارٍ البحث...",
+    "googleScrolling": "[GOOGLE SEARCH] جارٍ التمرير في نتائج البحث (لإرسال إشارة إلى Google)...",
+    "googleSearchingUrl": "[GOOGLE SEARCH] جارٍ البحث عن الرابط في النتائج...",
+    "googleNotFoundFirstPage": "[GOOGLE SEARCH] لم يتم العثور عليه في الصفحة الأولى، الانتقال إلى الصفحة التالية...",
+    "googleNotFound": "[GOOGLE SEARCH] لم يتم العثور على الموقع في نتائج البحث، الانتقال مباشرة إلى الموقع...",
+    "googleNote": "[GOOGLE SEARCH] ملاحظة: تم إجراء البحث على Google، هذا يرسل إشارة إلى Google (مهم لـ SEO)",
+    "googleFound": "[GOOGLE SEARCH] تم العثور على الموقع! في المركز {position} في النتائج، جارٍ النقر...",
+    "googleReached": "[GOOGLE SEARCH] تم الوصول إلى الموقع المستهدف، بدء التنقل في الصفحة...",
+    "googleSuccess": "[GOOGLE SEARCH] نجح! تم إكمال الوقت الإجمالي.",
+    "googleError": "[GOOGLE SEARCH] خطأ: {error}",
+    "bingStarting": "[BING SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url}",
+    "bingScrolling": "[BING SEARCH] جارٍ التمرير في نتائج البحث...",
+    "bingNotFound": "[BING SEARCH] لم يتم العثور على الموقع في نتائج البحث، الانتقال مباشرة إلى الموقع...",
+    "bingFound": "[BING SEARCH] تم العثور على الموقع! في المركز {position} في النتائج، جارٍ النقر...",
+    "bingSuccess": "[BING SEARCH] نجح!",
+    "bingError": "[BING SEARCH] خطأ: {error}",
+    "yahooStarting": "[YAHOO SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url}",
+    "yahooScrolling": "[YAHOO SEARCH] جارٍ التمرير في نتائج البحث...",
+    "yahooNotFound": "[YAHOO SEARCH] لم يتم العثور على الموقع في نتائج البحث، الانتقال مباشرة إلى الموقع...",
+    "yahooFound": "[YAHOO SEARCH] تم العثور على الموقع! في المركز {position} في النتائج، جارٍ النقر...",
+    "yahooSuccess": "[YAHOO SEARCH] نجح!",
+    "yahooError": "[YAHOO SEARCH] خطأ: {error}",
+    "duckduckgoStarting": "[DUCKDUCKGO SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url}",
+    "duckduckgoScrolling": "[DUCKDUCKGO SEARCH] جارٍ التمرير في نتائج البحث...",
+    "duckduckgoNotFound": "[DUCKDUCKGO SEARCH] لم يتم العثور على الموقع في نتائج البحث، الانتقال مباشرة إلى الموقع...",
+    "duckduckgoFound": "[DUCKDUCKGO SEARCH] تم العثور على الموقع! في المركز {position} في النتائج، جارٍ النقر...",
+    "duckduckgoSuccess": "[DUCKDUCKGO SEARCH] نجح!",
+    "duckduckgoError": "[DUCKDUCKGO SEARCH] خطأ: {error}",
+    "yandexStarting": "[YANDEX SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url}",
+    "yandexScrolling": "[YANDEX SEARCH] جارٍ التمرير في نتائج البحث...",
+    "yandexNotFound": "[YANDEX SEARCH] لم يتم العثور على الموقع في نتائج البحث، الانتقال مباشرة إلى الموقع...",
+    "yandexFound": "[YANDEX SEARCH] تم العثور على الموقع! في المركز {position} في النتائج، جارٍ النقر...",
+    "yandexSuccess": "[YANDEX SEARCH] نجح!",
+    "yandexError": "[YANDEX SEARCH] خطأ: {error}",
+    "directStarting2": "[DIRECT] بدء... الرابط: {url}{proxy}",
+    "directProxy": " | البروكسي: {proxy}",
+    "directSuccess": "[DIRECT] نجح! تم إكمال الوقت الإجمالي. ({current}/{total})",
+    "directChromeOpen": "[DIRECT] ستظل نافذة Chrome مفتوحة - يمكنك إغلاقها يدويًا أو الضغط على زر الإيقاف",
+    "directError": "[DIRECT] خطأ: {error}",
+    "sitemapLoading": "[SITEMAP] جارٍ تحميل خريطة الموقع: {url}",
+    "sitemapSubFound": "[SITEMAP] تم العثور على خريطة موقع فرعية: {url}",
+    "sitemapSubError": "[SITEMAP] لم يتم تحميل خريطة الموقع الفرعية: {error}",
+    "sitemapTotalUrls": "[SITEMAP] تم العثور على {count} رابط إجمالي",
+    "sitemapError": "[SITEMAP] خطأ: {error}",
+    "sitemapFoundFromRobots": "[SITEMAP] تم العثور على رابط خريطة الموقع من robots.txt: {url}",
+    "sitemapFound": "[SITEMAP] تم العثور على خريطة الموقع: {url}",
+    "currentPage": "  → الصفحة الحالية: {url}",
+    "navigatingTo": "  → الانتقال إلى صفحة جديدة: {url}",
+    "stayingOnPage": "  → البقاء على الصفحة لمدة {seconds} ثانية...",
+    "pageTimeCompleted": "  → تم إكمال {seconds} ثانية، استمرار التنقل في الصفحة...",
+    "pageNumber": "  → الصفحة {current}/{max}: {url}",
+    "totalPagesVisited": "  → إجمالي {count} صفحة تمت زيارتها",
+    "linkClickError": "  → خطأ في النقر على الرابط: {error}",
+    "noLinksFound": "  → لم يتم العثور على روابط للزيارة، البقاء على الصفحة الرئيسية",
+    "finalWait": "  → تنفيذ الانتظار النهائي: {seconds} ثانية...",
+    "browseError": "  → خطأ عام في التنقل في الصفحة: {error}",
+    "sitemapPagesCount": "[COUNT {index}] سيتم زيارة {count} صفحة من خريطة الموقع",
+    "sitemapPageVisiting": "[COUNT {index}] الصفحة {current}/{total}: {url}",
+    "sitemapPageStaying": "[COUNT {index}] البقاء على الصفحة لمدة {seconds} ثانية...",
+    "sitemapPageCompleted": "[COUNT {index}] تم إكمال {seconds} ثانية",
+    "sitemapPageWait": "[COUNT {index}] الانتظار {seconds} ثانية قبل الانتقال إلى الصفحة التالية...",
+    "sitemapPageError": "[COUNT {index}] خطأ في تحميل الصفحة: {error}",
+    "sitemapAllVisited": "[COUNT {index}] تمت زيارة جميع صفحات خريطة الموقع!",
+    "sitemapBrowseError": "[COUNT {index}] خطأ في التنقل في خريطة الموقع: {error}",
+    "visitStarting": "بدء الزيارة - زائر {type} - البحث: \"{keyword}\"",
+    "visitNew": "جديد",
+    "visitReturning": "عائد",
+    "visitDirectMode": "تم اختيار وضع الزيارة المباشرة",
+    "visitCompleted": "تم إكمال الزيارة - الوقت الإجمالي: {seconds} ثانية",
+    "visitError": "خطأ في الزيارة: {error}",
+    "searchVisitCompleted": "تم إكمال زيارة البحث - الوقت الإجمالي: {seconds} ثانية",
+    "searchVisitError": "خطأ في زيارة البحث: {error}، محاولة زيارة مباشرة...",
+    "searchEngineNotSupported": "[{engine}] محرك البحث غير مدعوم بعد، تنفيذ زيارة مباشرة",
+    "searchVisitGeneralError": "خطأ عام في زيارة البحث: {error}",
+    "driverClosed": "تم إغلاق سائق الزيارة المباشرة",
+    "driverCloseError": "خطأ في إغلاق السائق: {error}",
+    "searchDriverClosed": "تم إغلاق سائق زيارة البحث",
+    "searchDriverCloseError": "خطأ في إغلاق سائق البحث: {error}",
+    "proxyUsing": "استخدام البروكسي: {proxy}",
+    "proxyNotUsing": "عدم استخدام البروكسي (اختيار عشوائي)",
+    "pagesFound": "تم العثور على {count} صفحة، سيتم زيارة {visitCount} صفحة",
+    "schedulerStarted": "تم بدء المجدول، تم جدولة {count} زيارة",
+    "visitsExecuting": "جارٍ تنفيذ {count} زيارة...",
+    "allVisitsCompleted": "تم إكمال جميع الزيارات المجدولة ({executed}/{total})",
+    "visitExecutionError": "خطأ في تنفيذ الزيارة: {error}",
+    "stopStopping": "[STOP] إيقاف العملية...",
+    "stopClosingDrivers": "[STOP] جارٍ إغلاق {count} سائق...",
+    "stopDriverClosed": "[STOP] تم إغلاق السائق {current}/{total}",
+    "stopAllClosed": "[STOP] تم إغلاق جميع السواق",
+    "newProcessStarting": "بدء عملية جديدة...",
+    "site": "الموقع: {url}",
+    "totalVisitors": "إجمالي الزوار: {count}",
+    "startTime": "البداية: {time}",
+    "endTime": "النهاية: {time}",
+    "distribution": "التوزيع: {type}",
+    "visitRecorded": "[VISIT] تم تسجيل الزيارة",
+    "visitRecordError": "[VISIT] خطأ في تسجيل الزيارة: {error}",
+    "visitCallbackNotSet": "[VISIT] لم يتم تعيين callback الزيارة",
+    "rankingRecorded": "[RANKING] تم تسجيل الترتيب: {keyword} - المركز {position} (الصفحة {page})",
+    "rankingRecordError": "[RANKING] خطأ في تسجيل الترتيب: {error}",
+    "directStartingWithProxy": "[COUNT {index}] [DIRECT] بدء... الرابط: {url} | البروكسي: {proxy}",
+    "directProxyInvalid": "[COUNT {index}] [DIRECT] البروكسي غير مدعوم أو غير صالح: {proxy}، المتابعة بدون بروكسي",
+    "directStartingNoProxy": "[COUNT {index}] [DIRECT] بدء... الرابط: {url}",
+    "directSitemapActive": "[COUNT {index}] وضع خريطة الموقع نشط، جارٍ البحث عن خريطة الموقع...",
+    "directSitemapPagesFound": "[COUNT {index}] تم العثور على {count} صفحة، بدء التنقل...",
+    "directSitemapNoUrl": "[COUNT {index}] لم يتم العثور على الرابط في خريطة الموقع، تنفيذ التنقل العادي...",
+    "directSitemapNotFound": "[COUNT {index}] لم يتم العثور على خريطة الموقع، تنفيذ التنقل العادي...",
+    "directPageLoaded": "[COUNT {index}] تم تحميل الصفحة، بدء التنقل في الصفحة...",
+    "directChromeOpen2": "[COUNT {index}] ستظل نافذة Chrome مفتوحة",
+    "googleSearchStartingWithProxy": "[GOOGLE SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url} | البروكسي: {proxy}",
+    "googleSearchProxyInvalid": "[GOOGLE SEARCH] البروكسي غير مدعوم أو غير صالح: {proxy}، المتابعة بدون بروكسي",
+    "googleSearchStartingNoProxy": "[GOOGLE SEARCH] بدء... البحث: \"{keyword}\" | الرابط: {url} | البروكسي: لا يوجد",
+    "googleSearchSeleniumFailed": "[GOOGLE SEARCH] لم يتم العثور عليه باستخدام Selenium، محاولة استخدام JavaScript...",
+    "googleSearchJsSearch": "[GOOGLE SEARCH] تم إجراء البحث باستخدام JavaScript",
+    "googleSearchElementNotFound": "[GOOGLE SEARCH] لم يتم العثور على العنصر، جارٍ البحث باستخدام الرابط...",
+    "googleSearchUrlSearch": "[GOOGLE SEARCH] تم إجراء البحث باستخدام الرابط",
+    "googleSearchJsError": "[GOOGLE SEARCH] خطأ في JavaScript، جارٍ البحث باستخدام الرابط: {error}",
+    "bingSearchProxyUsing": "[BING SEARCH] استخدام البروكسي: {proxy}",
+    "yahooSearchProxyUsing": "[YAHOO SEARCH] استخدام البروكسي: {proxy}",
+    "duckduckgoSearchProxyUsing": "[DUCKDUCKGO SEARCH] استخدام البروكسي: {proxy}",
+    "yandexSearchProxyUsing": "[YANDEX SEARCH] استخدام البروكسي: {proxy}",
+    "proxyServerStarting": "[PROXY SERVER] بدء... البحث: \"{keyword}\" | الرابط: {url}",
+    "proxyServerConnecting": "[PROXY SERVER] جارٍ الاتصال بخادم البروكسي...",
+    "proxyServerWaiting": "[PROXY SERVER] انتظار اتصال البروكسي (12 ثانية)...",
+    "proxyServerSearching": "[PROXY SERVER] جارٍ البحث عن الرابط في النتائج...",
+    "proxyServerNotFound": "[PROXY SERVER] لم يتم العثور عليه في الصفحة الأولى، الانتقال إلى الصفحة التالية...",
+    "proxyServerPageId": "[PROXY SERVER] معرف الصفحة: {id}",
+    "proxyServerReached": "[PROXY SERVER] تم الوصول إلى الموقع المستهدف، بدء التنقل في الصفحة...",
+    "proxyServerSuccess": "[PROXY SERVER] نجح! تم إكمال الوقت الإجمالي. ({current}/{total})",
+    "proxyServerError": "[PROXY SERVER] خطأ: {error}",
+    "searchProxyUsing": "[SEARCH] استخدام البروكسي: {proxy}",
+    "searchProxyNotFound": "[SEARCH] لم يتم العثور على بروكسي صالح، المتابعة بدون بروكسي",
+    "directProxyUsing": "[DIRECT] استخدام البروكسي: {proxy}",
+    "directProxyNotFound": "[DIRECT] لم يتم العثور على بروكسي صالح، المتابعة بدون بروكسي",
+    "proxyTestStarting": "[PROXY TEST] بدء اختبار البروكسي...",
+    "proxyTestFileNotFound": "[PROXY TEST] لم يتم العثور على ملف البروكسي أو أنه فارغ",
+    "proxyTestTesting": "[PROXY TEST] جارٍ اختبار {count} بروكسي...",
+    "proxyTestSupported": "[PROXY TEST] تم العثور على {valid} بروكسي مدعوم، {unsupported} غير مدعوم (SOCKS4 إلخ)",
+    "proxyTestFirstN": "[PROXY TEST] جارٍ اختبار أول {count} بروكسي...",
+    "proxyTestTestingN": "[PROXY TEST] {current}/{total} - جارٍ الاختبار: {proxy}",
+    "proxyTestWorking": "[PROXY TEST] ✅ يعمل: {proxy}",
+    "proxyTestNotWorking": "[PROXY TEST] ❌ لا يعمل: {proxy}",
+    "proxyTestError": "[PROXY TEST] ❌ خطأ: {proxy} - {error}",
+    "proxyTestCompleted": "[PROXY TEST] تم إكمال الاختبار!",
+    "proxyTestTotal": "[PROXY TEST] الإجمالي: {count}",
+    "proxyTestValid": "[PROXY TEST] العامل: {count}",
+    "proxyTestInvalid": "[PROXY TEST] غير العامل: {count}",
+    "proxyTestUnsupported": "[PROXY TEST] غير المدعوم: {count}",
+    "pingStarting": "[PING] جارٍ تفعيل بوتات محركات البحث... الرابط: {url}",
+    "pingSitemapFound": "[PING] تم العثور على خريطة الموقع: {url}",
+    "pingGoogleSuccess": "[PING] ✅ نجح ping خريطة موقع Google",
+    "pingGoogleError": "[PING] ❌ خطأ في ping خريطة موقع Google: {error}",
+    "pingBingSuccess": "[PING] ✅ نجح ping خريطة موقع Bing",
+    "pingBingError": "[PING] ❌ خطأ في ping خريطة موقع Bing: {error}",
+    "pingSitemapNotFound": "[PING] ⚠️ لم يتم العثور على خريطة الموقع، سيتم تنفيذ ping الرابط فقط",
+    "pingUrlServices": "[PING] جارٍ تجربة خدمات ping الرابط...",
+    "pingRssFound": "[PING] تم العثور على RSS feed: {url}",
+    "pingRssService": "[PING] خدمة ping RSS متاحة: {service}",
+    "pingSocialSuggestion": "[PING] اقتراح ping وسائل التواصل الاجتماعي: مشاركة الرابط على وسائل التواصل الاجتماعي تفعل البوتات",
+    "pingCompleted": "[PING] تم إكمال ping! نجح: {success}/{total}",
+    "pingGeneralError": "[PING] خطأ عام: {error}",
+    "seoAnalysisStarting": "[SEO ANALYSIS] بدء تحليل SEO... الرابط: {url}",
+    "seoAnalysisMetaTags": "[SEO ANALYSIS] جارٍ فحص علامات Meta...",
+    "seoAnalysisHeadings": "[SEO ANALYSIS] جارٍ فحص علامات العناوين...",
+    "seoAnalysisImages": "[SEO ANALYSIS] جارٍ فحص علامات alt للصور...",
+    "seoAnalysisLinks": "[SEO ANALYSIS] جارٍ فحص الروابط...",
+    "seoAnalysisContent": "[SEO ANALYSIS] جارٍ تحليل المحتوى...",
+    "seoAnalysisMobile": "[SEO ANALYSIS] جارٍ فحص التوافق مع الجوال...",
+    "seoAnalysisSchema": "[SEO ANALYSIS] جارٍ فحص Schema markup...",
+    "seoAnalysisCompleted": "[SEO ANALYSIS] تم إكمال التحليل! النتيجة: {score}/100",
+    "seoAnalysisError": "[SEO ANALYSIS] خطأ: {error}",
+    "rankingCheckStarting": "[RANKING CHECK] جارٍ فحص الترتيب... الرابط: {url}، الكلمة المفتاحية: \"{keyword}\"",
+    "rankingCheckFound": "[RANKING CHECK] ✅ تم العثور عليه! المركز: {position} (الصفحة {page})",
+    "rankingCheckNotFound": "[RANKING CHECK] ❌ لم يتم العثور عليه (في أول صفحتين)",
+    "rankingCheckError": "[RANKING CHECK] خطأ: {error}",
+    "proxyDownloadStarting": "[PROXY DOWNLOAD] جارٍ تحميل قائمة البروكسي... المصدر: {source}",
+    "proxyDownloadDownloaded": "[PROXY DOWNLOAD] تم تحميل {count} بروكسي",
+    "proxyDownloadSaved": "[PROXY DOWNLOAD] ✅ تم حفظ قائمة البروكسي: {file} ({count} بروكسي)",
+    "proxyDownloadError": "[PROXY DOWNLOAD] ❌ خطأ: {error}",
+    "headlessMode": "الوضع المخفي: {status}",
+    "headlessModeActive": "نشط",
+    "headlessModeInactive": "غير نشط"
+  }
+}
+

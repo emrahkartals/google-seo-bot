@@ -20,6 +20,7 @@
                     <select id="language-select">
                         <option value="tr">🇹🇷 Türkçe</option>
                         <option value="en">🇬🇧 English</option>
+                        <option value="ar">🇸🇦 العربية</option>
                         <option value="de">🇩🇪 Deutsch</option>
                         <option value="fr">🇫🇷 Français</option>
                         <option value="ru">🇷🇺 Русский</option>
@@ -120,6 +121,14 @@
                 <div class="form-group">
                     <label for="page-count" data-i18n="settings.pageCount">Gezilecek Sayfa Sayısı</label>
                     <input type="number" id="page-count" value="10" min="1" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="headless-mode" checked>
+                        <span data-i18n="settings.headlessMode">🔒 Gizli Mod (Chrome pencerelerini gizle)</span>
+                    </label>
+                    <small data-i18n="settings.headlessModeDesc">Aktif edildiğinde Chrome pencereleri görünmez olacak</small>
                 </div>
 
                 <div class="button-group">

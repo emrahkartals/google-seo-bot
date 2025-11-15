@@ -26,7 +26,9 @@
     "pageMaxTime": "Page Max Time (sec)",
     "totalMinTime": "Total Min Time (min)",
     "totalMaxTime": "Total Max Time (min)",
-    "pageCount": "Page Count to Visit"
+    "pageCount": "Page Count to Visit",
+    "headlessMode": "🔒 Headless Mode (Hide Chrome windows)",
+    "headlessModeDesc": "When enabled, Chrome windows will be invisible"
   },
   "buttons": {
     "checkSitemap": "Check Sitemap",

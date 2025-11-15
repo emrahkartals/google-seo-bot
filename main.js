@@ -1,18 +1,44 @@
 const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const bot = require('./libs/index');
 
 let mainWindow;
 let isRunning = false;
+let currentLanguage = 'tr'; // Varsayılan dil
+let menuTranslations = {}; // Menü çevirileri
+
+// Menü çevirilerini yükle
+function loadMenuTranslations(lang) {
+    try {
+        const translationsPath = path.join(__dirname, 'locales', `${lang}.json`);
+        if (fs.existsSync(translationsPath)) {
+            const translations = JSON.parse(fs.readFileSync(translationsPath, 'utf8'));
+            menuTranslations = translations.menu || {};
+        } else {
+            // Fallback to Turkish
+            const fallbackPath = path.join(__dirname, 'locales', 'tr.json');
+            if (fs.existsSync(fallbackPath)) {
+                const translations = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+                menuTranslations = translations.menu || {};
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load menu translations:', error);
+        menuTranslations = {};
+    }
+}
 
 // Menü şablonu oluştur
 function createMenu() {
+    const t = (key) => menuTranslations[key] || key;
+    
     const template = [
         {
-            label: 'Dosya',
+            label: t('file') || 'Dosya',
             submenu: [
                 {
-                    label: 'Yenile',
+                    label: t('reload') || 'Yenile',
                     accelerator: 'CmdOrCtrl+R',
                     click: (item, focusedWindow) => {
                         if (focusedWindow) {
@@ -22,7 +48,7 @@ function createMenu() {
                 },
                 { type: 'separator' },
                 {
-                    label: 'Çıkış',
+                    label: t('exit') || 'Çıkış',
                     accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
                     click: () => {
                         app.quit();
@@ -31,10 +57,10 @@ function createMenu() {
             ]
         },
         {
-            label: 'Bot',
+            label: t('bot') || 'Bot',
             submenu: [
                 {
-                    label: 'Başlat',
+                    label: t('start') || 'Başlat',
                     accelerator: 'CmdOrCtrl+S',
                     enabled: true,
                     click: () => {
@@ -44,7 +70,7 @@ function createMenu() {
                     }
                 },
                 {
-                    label: 'Durdur',
+                    label: t('stop') || 'Durdur',
                     accelerator: 'CmdOrCtrl+Shift+S',
                     enabled: true,
                     click: () => {
@@ -55,7 +81,7 @@ function createMenu() {
                 },
                 { type: 'separator' },
                 {
-                    label: 'Sitemap Kontrol Et',
+                    label: t('checkSitemap') || 'Sitemap Kontrol Et',
                     accelerator: 'CmdOrCtrl+K',
                     click: () => {
                         if (mainWindow && !mainWindow.isDestroyed()) {
@@ -66,10 +92,10 @@ function createMenu() {
             ]
         },
         {
-            label: 'Ayarlar',
+            label: t('settings') || 'Ayarlar',
             submenu: [
                 {
-                    label: 'API Ayarları',
+                    label: t('apiSettings') || 'API Ayarları',
                     accelerator: 'CmdOrCtrl+,',
                     click: () => {
                         if (mainWindow && !mainWindow.isDestroyed()) {
@@ -80,10 +106,10 @@ function createMenu() {
             ]
         },
         {
-            label: 'Görünüm',
+            label: t('view') || 'Görünüm',
             submenu: [
                 {
-                    label: 'Yenile',
+                    label: t('reload') || 'Yenile',
                     accelerator: 'F5',
                     click: (item, focusedWindow) => {
                         if (focusedWindow) {
@@ -92,7 +118,7 @@ function createMenu() {
                     }
                 },
                 {
-                    label: 'Tam Ekran',
+                    label: t('fullScreen') || 'Tam Ekran',
                     accelerator: process.platform === 'darwin' ? 'Ctrl+Cmd+F' : 'F11',
                     click: (item, focusedWindow) => {
                         if (focusedWindow) {
@@ -102,7 +128,7 @@ function createMenu() {
                 },
                 { type: 'separator' },
                 {
-                    label: 'Geliştirici Araçları',
+                    label: t('developerTools') || 'Geliştirici Araçları',
                     accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Ctrl+Shift+I',
                     click: (item, focusedWindow) => {
                         if (focusedWindow) {
@@ -111,16 +137,16 @@ function createMenu() {
                     }
                 },
                 { type: 'separator' },
-                { role: 'resetZoom', label: 'Yakınlaştırmayı Sıfırla' },
-                { role: 'zoomIn', label: 'Yakınlaştır' },
-                { role: 'zoomOut', label: 'Uzaklaştır' }
+                { role: 'resetZoom', label: t('resetZoom') || 'Yakınlaştırmayı Sıfırla' },
+                { role: 'zoomIn', label: t('zoomIn') || 'Yakınlaştır' },
+                { role: 'zoomOut', label: t('zoomOut') || 'Uzaklaştır' }
             ]
         },
         {
-            label: 'Yardım',
+            label: t('help') || 'Yardım',
             submenu: [
                 {
-                    label: 'Hakkında',
+                    label: t('about') || 'Hakkında',
                     click: () => {
                         if (mainWindow && !mainWindow.isDestroyed()) {
                             mainWindow.webContents.send('menu-about');
@@ -129,13 +155,13 @@ function createMenu() {
                 },
                 { type: 'separator' },
                 {
-                    label: 'GitHub Repository',
+                    label: t('github') || 'GitHub Repository',
                     click: () => {
                         require('electron').shell.openExternal('https://github.com/emrahkartals/google-seo-bot');
                     }
                 },
                 {
-                    label: 'Dokümantasyon',
+                    label: t('documentation') || 'Dokümantasyon',
                     click: () => {
                         require('electron').shell.openExternal('https://github.com/emrahkartals/google-seo-bot#readme');
                     }
@@ -149,15 +175,15 @@ function createMenu() {
         template.unshift({
             label: app.getName(),
             submenu: [
-                { role: 'about', label: 'Hakkında' },
+                { role: 'about', label: t('about') || 'Hakkında' },
                 { type: 'separator' },
-                { role: 'services', label: 'Servisler' },
+                { role: 'services', label: t('services') || 'Servisler' },
                 { type: 'separator' },
-                { role: 'hide', label: 'Gizle' },
-                { role: 'hideothers', label: 'Diğerlerini Gizle' },
-                { role: 'unhide', label: 'Göster' },
+                { role: 'hide', label: t('hide') || 'Gizle' },
+                { role: 'hideothers', label: t('hideOthers') || 'Diğerlerini Gizle' },
+                { role: 'unhide', label: t('show') || 'Göster' },
                 { type: 'separator' },
-                { role: 'quit', label: 'Çıkış' }
+                { role: 'quit', label: t('exit') || 'Çıkış' }
             ]
         });
     }
@@ -314,8 +340,21 @@ ipcMain.handle('download-proxies', async (event, source) => {
     }
 });
 
+// Dil değiştirme handler
+ipcMain.handle('set-language', async (event, lang) => {
+    try {
+        currentLanguage = lang || 'tr';
+        loadMenuTranslations(currentLanguage);
+        createMenu(); // Menüyü yeniden oluştur
+        return { success: true };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+});
+
 // Uygulama hazır olduğunda pencere oluştur
 app.whenReady().then(() => {
+    loadMenuTranslations(currentLanguage); // Menü çevirilerini yükle
     createMenu(); // Menüyü oluştur
     createWindow();
 
