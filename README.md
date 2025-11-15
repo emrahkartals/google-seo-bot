@@ -19,6 +19,14 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 
 > ⚠️ **Önemli**: Bu bot eğitim ve test amaçlıdır. Google'ın hizmet şartlarına uygun kullanın.
 
+## 🆕 Son Güncellemeler (v1.1.0)
+
+- ✅ **Rotating Proxy Düzeltmesi**: Proxy format normalizasyonu ve SOCKS4 filtrelenmesi
+- ✅ **Proxy Test Özelliği**: Proxy'lerin çalışıp çalışmadığını test edin
+- ✅ **Google Sıralama Takibi**: Otomatik sıralama kaydı ve manuel kontrol
+- ✅ **SEO Analiz Sayfası**: Detaylı SEO analizi ve 0-100 skor sistemi
+- ✅ **Arama Motoru Botlarını Tetikleme**: Google ve Bing sitemap ping
+
 ## 🚀 Özellikler
 
 ### 🎨 Arayüz ve Kullanıcı Deneyimi
@@ -34,13 +42,18 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 - **Google Arama Simülasyonu**: Gerçekçi Google aramaları yaparak sitenize organik trafik gönderir
 - **Otomatik Sayfa Gezintisi**: Sitenizdeki sayfalar arasında gerçekçi gezinti yapar
 - **Sitemap Desteği**: Sitemap.xml dosyalarını otomatik olarak bulur ve tüm sayfaları ziyaret eder
+- **🔍 SEO Analiz Sayfası**: Detaylı SEO analizi yapar (Meta tags, Headings, Images, Links, Technical SEO)
+- **📊 Google Sıralama Takibi**: Google'da sıralama pozisyonunuzu otomatik kaydeder ve takip eder
+- **🤖 Arama Motoru Botlarını Tetikleme**: Google ve Bing'e sitemap ping yaparak botları bilgilendirir
 
 ### ⚙️ Gelişmiş Özellikler
-- **Proxy Desteği**: Proxy sunucuları kullanarak farklı IP adreslerinden trafik gönderebilir
-- **Zamanlanmış Ziyaretler**: Ziyaretleri belirli zaman aralıklarında planlayabilirsiniz
-- **Stealth Modu**: Bot tespitini önlemek için gelişmiş spoofing teknikleri
-- **Gerçekçi Davranışlar**: Rastgele scroll, bekleme süreleri ve sayfa gezintileri
-- **URL Otomatik Düzeltme**: http/https protokolü otomatik eklenir
+- **🔄 Rotating Proxy Desteği**: Otomatik proxy rotasyonu ile farklı IP adreslerinden trafik gönderir
+- **🧪 Proxy Test Özelliği**: Proxy'lerin çalışıp çalışmadığını test eder
+- **📈 Zamanlanmış Ziyaretler**: Ziyaretleri belirli zaman aralıklarında planlayabilirsiniz
+- **🕵️ Stealth Modu**: Bot tespitini önlemek için gelişmiş spoofing teknikleri
+- **🎭 Gerçekçi Davranışlar**: Rastgele scroll, bekleme süreleri ve sayfa gezintileri
+- **🔗 URL Otomatik Düzeltme**: http/https protokolü otomatik eklenir
+- **✅ Proxy Format Desteği**: HTTP, HTTPS, SOCKS5 proxy formatlarını destekler (SOCKS4 otomatik filtrelenir)
 
 ## 📋 Gereksinimler
 
@@ -82,14 +95,18 @@ Bu komut `dist/` klasöründe yüklenebilir bir Windows installer oluşturur.
 
 Proxy kullanmak istiyorsanız, proxy dosyalarını `proxy/` klasörüne ekleyin:
 
-**Format:**
+**Desteklenen Formatlar:**
 ```
-123.45.67.89:8080
-98.76.54.32:3128:username:password
+http://123.45.67.89:8080
+https://98.76.54.32:3128
+socks5://111.222.333.444:1080
+123.45.67.89:8080  (otomatik http:// eklenir)
 ```
 
 - Her satırda bir proxy adresi
-- Format: `ip:port` veya `ip:port:username:password`
+- Desteklenen: `http://`, `https://`, `socks5://` (SOCKS4 otomatik filtrelenir)
+- Format: `protocol://ip:port` veya `ip:port` (otomatik http:// eklenir)
+- Proxy test butonu ile çalışan proxy'leri kontrol edebilirsiniz
 
 ## 🎯 Kullanım
 
@@ -120,10 +137,33 @@ npm start
    - **Toplam Min/Max Süre**: Toplam ziyaret süreleri (dakika)
    - **Gezilecek Sayfa Sayısı**: Sitemap'ten kaç sayfa ziyaret edilecek
 
-#### Adım 3: Bot'u Başlatın
+#### Adım 3: Ek Özellikler (Opsiyonel)
+
+**SEO Analizi:**
+- "SEO Analizi" butonuna tıklayın
+- Detaylı SEO raporu modal'da görüntülenir
+- SEO skoru (0-100) ve tüm kriterler kontrol edilir
+
+**Proxy Test:**
+- "Proxy Test Et" butonuna tıklayın
+- İlk 20 proxy test edilir
+- Çalışan/çalışmayan proxy'ler loglarda gösterilir
+
+**Sıralama Kontrol:**
+- URL ve keyword girin
+- "Sıralama Kontrol Et" butonuna tıklayın
+- Google'da pozisyon kontrol edilir
+
+**Botları Tetikle:**
+- "Botları Tetikle" butonuna tıklayın
+- Google ve Bing'e sitemap ping yapılır
+- Arama motoru botları bilgilendirilir
+
+#### Adım 4: Bot'u Başlatın
 - "Başlat" butonuna tıklayın
 - Loglar panelinde işlemleri takip edin (tüm mesajlar seçilen dilde görüntülenir)
 - Grafik panelinde ziyaret istatistiklerini görüntüleyin
+- Google araması yapıldığında sıralama otomatik kaydedilir
 - İstediğiniz zaman "Durdur" butonuna tıklayarak durdurabilirsiniz
 
 ### Programatik Kullanım (Gelişmiş)
@@ -299,6 +339,22 @@ Ziyaret kayıtları için callback ayarlar.
 
 Sitemap'teki sayfa sayısını kontrol eder.
 
+### `testProxies()`
+
+Proxy'leri test eder ve çalışan/çalışmayan proxy'leri gösterir.
+
+### `checkRanking(url, keyword)`
+
+Google'da belirtilen keyword için sıralama pozisyonunu kontrol eder.
+
+### `analyzeSEO(url)`
+
+Sitenin detaylı SEO analizini yapar ve rapor döndürür.
+
+### `pingSearchEngines(url)`
+
+Arama motoru botlarını (Google, Bing) tetiklemek için sitemap ping yapar.
+
 ## 🌍 Çoklu Dil Desteği
 
 Uygulama **7 farklı dilde** tam destek sunar:
@@ -360,9 +416,11 @@ npm install chromedriver --save
 
 #### Proxy Bağlantı Hatası
 - ✅ Proxy dosyalarını kontrol edin (`proxy/` klasörü)
-- ✅ Proxy formatının doğru olduğundan emin olun (`ip:port` veya `ip:port:user:pass`)
-- ✅ Proxy'lerin çalışır durumda olduğunu test edin
+- ✅ Proxy formatının doğru olduğundan emin olun (`http://ip:port`, `socks5://ip:port` vb.)
+- ✅ "Proxy Test Et" butonunu kullanarak proxy'lerin çalışıp çalışmadığını kontrol edin
+- ✅ SOCKS4 proxy'ler otomatik filtrelenir (Chrome desteklemiyor)
 - ✅ Firewall ayarlarınızı kontrol edin
+- ✅ Rotating proxy sorunu düzeltildi - artık proxy'ler doğru formatta kullanılıyor
 
 #### Sitemap Bulunamıyor
 - ✅ Sitenizin `sitemap.xml` dosyasının erişilebilir olduğundan emin olun
