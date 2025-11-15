@@ -44,6 +44,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Language
     setLanguage: (lang) => ipcRenderer.invoke('set-language', lang),
     
+    // Theme
+    setTheme: (isDark) => ipcRenderer.invoke('set-theme', isDark),
+    
     // Cleanup
     removeAllListeners: (channel) => {
         ipcRenderer.removeAllListeners(channel);

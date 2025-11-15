@@ -238,6 +238,31 @@
     "startTime": "Start: {time}",
     "endTime": "End: {time}",
     "distribution": "Distribution: {type}"
+  },
+  "menu": {
+    "file": "File",
+    "reload": "Reload",
+    "exit": "Exit",
+    "bot": "Bot",
+    "start": "Start",
+    "stop": "Stop",
+    "checkSitemap": "Check Sitemap",
+    "settings": "Settings",
+    "apiSettings": "API Settings",
+    "view": "View",
+    "fullScreen": "Full Screen",
+    "developerTools": "Developer Tools",
+    "resetZoom": "Reset Zoom",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "help": "Help",
+    "about": "About",
+    "github": "GitHub Repository",
+    "documentation": "Documentation",
+    "services": "Services",
+    "hide": "Hide",
+    "hideOthers": "Hide Others",
+    "show": "Show"
   }
 }
 

@@ -109,12 +109,12 @@ body {
 
 .language-selector select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .language-selector select:hover {
-    border-color: #667eea;
+    border-color: var(--accent-color);
 }
 
 .header-content h1 {

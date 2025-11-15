@@ -167,8 +167,15 @@ function initTheme() {
         themeIcon.textContent = '🌙';
     }
     
+    // Başlangıçta Electron menüsü için tema ayarını yap
+    if (window.electronAPI && window.electronAPI.setTheme) {
+        window.electronAPI.setTheme(isDarkTheme).catch(() => {
+            // Hata durumunda sessizce devam et
+        });
+    }
+    
     if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
+        themeToggle.addEventListener('click', async () => {
             isDarkTheme = !isDarkTheme;
             localStorage.setItem('darkTheme', isDarkTheme);
             
@@ -178,6 +185,11 @@ function initTheme() {
             } else {
                 document.body.classList.remove('dark-theme');
                 themeIcon.textContent = '🌙';
+            }
+            
+            // Electron menüsü için tema ayarını güncelle
+            if (window.electronAPI && window.electronAPI.setTheme) {
+                await window.electronAPI.setTheme(isDarkTheme);
             }
         });
     }

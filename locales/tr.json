@@ -238,6 +238,31 @@
     "startTime": "Başlangıç: {time}",
     "endTime": "Bitiş: {time}",
     "distribution": "Dağılım: {type}"
+  },
+  "menu": {
+    "file": "Dosya",
+    "reload": "Yenile",
+    "exit": "Çıkış",
+    "bot": "Bot",
+    "start": "Başlat",
+    "stop": "Durdur",
+    "checkSitemap": "Sitemap Kontrol Et",
+    "settings": "Ayarlar",
+    "apiSettings": "API Ayarları",
+    "view": "Görünüm",
+    "fullScreen": "Tam Ekran",
+    "developerTools": "Geliştirici Araçları",
+    "resetZoom": "Yakınlaştırmayı Sıfırla",
+    "zoomIn": "Yakınlaştır",
+    "zoomOut": "Uzaklaştır",
+    "help": "Yardım",
+    "about": "Hakkında",
+    "github": "GitHub Repository",
+    "documentation": "Dokümantasyon",
+    "services": "Servisler",
+    "hide": "Gizle",
+    "hideOthers": "Diğerlerini Gizle",
+    "show": "Göster"
   }
 }
 
