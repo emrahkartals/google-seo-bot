@@ -27,9 +27,6 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 ## 🆕 Son Güncellemeler (v1.4.0)
 
 - ✅ **🌙 Karanlık Mod**: Modern karanlık tema desteği - Header'daki tema butonu ile kolayca değiştirin
-- ✅ **🛡️ Footer Koruması**: Korumalı footer ile telif hakkı bilgileri - Değiştirilemez ve silinemez
-- ✅ **📄 Lisans Bilgileri**: Proprietary lisans ve detaylı lisans bilgileri
-- ✅ **ℹ️ Gelişmiş Hakkında Dialog**: Detaylı lisans bilgileri ve uyarılar içeren modal dialog
 - ✅ **💾 Tema Tercihi Kaydı**: Karanlık mod tercihiniz otomatik kaydedilir
 
 ### Önceki Güncellemeler (v1.3.0)
@@ -43,7 +40,6 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 - ✅ **🔑 API Ayarları Menüsü**: Menüden API key'lerinizi ekleyin (OpenAI, Anthropic, Google Gemini)
 - ✅ **AI Destekli SEO Önerileri**: API key'lerle gelişmiş AI önerileri alın
 - ✅ **Güvenli API Key Yönetimi**: API key'ler yerel olarak güvenli şekilde saklanır
-- ✅ **Şifre Göster/Gizle**: API key'lerinizi güvenli şekilde görüntüleyin
 
 ### Önceki Güncellemeler (v1.1.0)
 
@@ -58,7 +54,6 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 ### 🎨 Arayüz ve Kullanıcı Deneyimi
 - **Modern GUI Arayüzü**: Kullanıcı dostu Windows masaüstü uygulaması
 - **🌙 Karanlık Mod**: Modern karanlık tema desteği - Göz yormayan karanlık arayüz
-- **🛡️ Korumalı Footer**: Telif hakkı bilgileri ile korumalı footer
 - **Gerçek Zamanlı Loglar**: Tüm işlemleri canlı olarak takip edin
 - **📈 İnteraktif Grafikler**: Ziyaret istatistiklerini görselleştirin (çizgi/çubuk grafik)
 - **İstatistikler**: Toplam ziyaret sayısı ve son ziyaret bilgileri
