@@ -19,7 +19,14 @@ module.exports = function () {
                             console.error("Error reading file:", error);
                         } else {
                             const plist = data.toString().split("\n"); // Split file content by newlines
-                            proxyList.push(...plist); // Add all proxies to the proxyList
+                            // Proxy'leri temizle ve filtrele
+                            plist.forEach(proxy => {
+                                const cleaned = proxy.trim();
+                                // Boş satırları ve geçersiz formatları atla
+                                if (cleaned && cleaned.length > 0) {
+                                    proxyList.push(cleaned);
+                                }
+                            });
                         }
 
                         // Decrement pending files and resolve when all files are processed

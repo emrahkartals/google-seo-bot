@@ -16,6 +16,7 @@ const pageCountInput = document.getElementById('page-count');
 const startBtn = document.getElementById('start-btn');
 const stopBtn = document.getElementById('stop-btn');
 const checkSitemapBtn = document.getElementById('check-sitemap-btn');
+const testProxyBtn = document.getElementById('test-proxy-btn');
 const clearLogsBtn = document.getElementById('clear-logs-btn');
 const chartTypeBtn = document.getElementById('chart-type-btn');
 const resetChartBtn = document.getElementById('reset-chart-btn');
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     startBtn.addEventListener('click', handleStart);
     stopBtn.addEventListener('click', handleStop);
     checkSitemapBtn.addEventListener('click', handleCheckSitemap);
+    testProxyBtn.addEventListener('click', handleTestProxy);
     clearLogsBtn.addEventListener('click', clearLogs);
     chartTypeBtn.addEventListener('click', toggleChartType);
     resetChartBtn.addEventListener('click', resetChart);
@@ -381,6 +383,36 @@ async function handleCheckSitemap() {
             }
         } else {
             addLog(t('messages.sitemapError', {error: result.message}), 'error');
+        }
+    }
+}
+
+async function handleTestProxy() {
+    if (window.electronAPI) {
+        testProxyBtn.disabled = true;
+        addLog(t('messages.proxyTestStarting'), '');
+        
+        try {
+            const result = await window.electronAPI.testProxies();
+            testProxyBtn.disabled = false;
+            
+            if (result.success && result.results) {
+                const r = result.results;
+                addLog(t('messages.proxyTestCompleted'), 'success');
+                addLog(`${t('messages.proxyTestTotal')}: ${r.total}`, '');
+                addLog(`${t('messages.proxyTestWorking')}: ${r.valid}`, 'success');
+                addLog(`${t('messages.proxyTestNotWorking')}: ${r.invalid}`, 'error');
+                addLog(`${t('messages.proxyTestUnsupported')}: ${r.unsupported}`, 'warning');
+                
+                if (r.working.length > 0) {
+                    addLog(`${t('messages.proxyTestWorkingList')}: ${r.working.slice(0, 5).join(', ')}${r.working.length > 5 ? '...' : ''}`, '');
+                }
+            } else {
+                addLog(t('messages.proxyTestError', {error: result.message || 'Unknown error'}), 'error');
+            }
+        } catch (error) {
+            testProxyBtn.disabled = false;
+            addLog(t('messages.proxyTestError', {error: error.message}), 'error');
         }
     }
 }

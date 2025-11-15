@@ -72,6 +72,51 @@ function getRandomTime(minSeconds, maxSeconds) {
     return random(minSeconds * 1000, maxSeconds * 1000);
 }
 
+// Proxy normalizasyon fonksiyonu - proxy formatını düzeltir
+function normalizeProxy(proxyString) {
+    if (!proxyString) return null;
+    
+    // Boşlukları temizle
+    var proxy = proxyString.trim();
+    if (!proxy || proxy.length === 0) return null;
+    
+    // Protocol kontrolü
+    var protocol = null;
+    var address = proxy;
+    
+    // Protocol varsa ayır
+    if (proxy.startsWith('http://')) {
+        protocol = 'http';
+        address = proxy.substring(7); // 'http://' kısmını çıkar
+    } else if (proxy.startsWith('https://')) {
+        protocol = 'https';
+        address = proxy.substring(8); // 'https://' kısmını çıkar
+    } else if (proxy.startsWith('socks5://')) {
+        protocol = 'socks5';
+        address = proxy.substring(9); // 'socks5://' kısmını çıkar
+    } else if (proxy.startsWith('socks4://')) {
+        // Chrome SOCKS4'ü desteklemiyor, null döndür
+        return null;
+    } else {
+        // Protocol yoksa HTTP varsay
+        protocol = 'http';
+        address = proxy;
+    }
+    
+    // Address boşsa null döndür
+    if (!address || address.length === 0) return null;
+    
+    // Chrome için proxy formatı: protocol://address
+    // Chrome sadece http, https ve socks5 destekler
+    if (protocol === 'http' || protocol === 'https') {
+        return `${protocol}://${address}`;
+    } else if (protocol === 'socks5') {
+        return `socks5://${address}`;
+    }
+    
+    return null;
+}
+
 async function fetchSitemap(sitemapUrl) {
     return new Promise((resolve, reject) => {
         try {
@@ -587,13 +632,20 @@ async function browseSitemapPages(driver, sitemapUrls, minTime, maxTime, countIn
 
 async function Direct(url, proxy, minTime, maxTime, useSitemap, countIndex){
     var options = new chrome.Options()
-    if (proxy)
-        options.addArguments(`--proxy-server=http://${proxy}`)
+    var normalizedProxy = normalizeProxy(proxy)
+    if (normalizedProxy) {
+        options.addArguments(`--proxy-server=${normalizedProxy}`)
+        log(`[COUNT ${countIndex}] [DIRECT] Başlatılıyor... URL: ${url} | Proxy: ${normalizedProxy}`)
+    } else {
+        if (proxy) {
+            log(`[COUNT ${countIndex}] [DIRECT] Proxy desteklenmiyor veya geçersiz: ${proxy}, proxy olmadan devam ediliyor`)
+        }
+        log(`[COUNT ${countIndex}] [DIRECT] Başlatılıyor... URL: ${url}`)
+    }
     PERMISSIONS.forEach(perms => {
         options.addArguments(perms)
     })
     options.excludeSwitches('enable-logging')
-    log(`[COUNT ${countIndex}] [DIRECT] Başlatılıyor... URL: ${url}${proxy ? ' | Proxy: ' + proxy : ''}`)
     var driver = await new webDriver.Builder().forBrowser('chrome').setChromeService(chromedriver).setChromeOptions(options).build()
     await Stealth(driver)
     
@@ -1382,22 +1434,39 @@ async function main(url, keyboard, count, option, minTime, maxTime, useSitemap){
     logI18n('logMessages.sitemapMode', {status: useSitemap ? 'Aktif' : 'Kapalı'})
     log(`========================================`)
     var proxy = await loadproxy()
+    // Desteklenen proxy'leri filtrele (SOCKS4'ü hariç tut)
+    var validProxies = []
     if (proxy.length > 0) {
-        logI18n('logMessages.proxyListLoaded', {count: proxy.length})
+        proxy.forEach(p => {
+            var normalized = normalizeProxy(p)
+            if (normalized) {
+                validProxies.push(p) // Orijinal proxy string'ini sakla (normalizeProxy fonksiyonu içinde normalize edilecek)
+            }
+        })
+        if (validProxies.length > 0) {
+            logI18n('logMessages.proxyListLoaded', {count: validProxies.length})
+            if (validProxies.length < proxy.length) {
+                log(`Uyarı: ${proxy.length - validProxies.length} proxy desteklenmiyor (SOCKS4 vb.) ve atlandı`)
+            }
+        } else {
+            log(`Uyarı: ${proxy.length} proxy yüklendi ancak hiçbiri desteklenmiyor`)
+        }
     } else {
         logI18n('logMessages.proxyListNotFound')
     }
     if (option == "Direct"){
         logI18n('logMessages.directStarting', {url: url})
         while (usedDriver != count && usedDriver < count){
-            await Direct(url, proxy.length > 0 ? proxy[usedDriver] : null, minTime, maxTime, useSitemap, usedDriver + 1)
+            var proxyToUse = validProxies.length > 0 ? validProxies[usedDriver % validProxies.length] : null
+            await Direct(url, proxyToUse, minTime, maxTime, useSitemap, usedDriver + 1)
             usedDriver += 1
         }
         logI18n('logMessages.directCompleted')
     }else if (option == "Google"){
         logI18n('logMessages.googleSearchStarting', {url: url, keyword: keyboard})
         while (usedDriver != count && usedDriver < count){
-            await googleSearch(url, keyboard, proxy.length > 0 ? proxy[usedDriver] : null, minTime, maxTime)
+            var proxyToUse = validProxies.length > 0 ? validProxies[usedDriver % validProxies.length] : null
+            await googleSearch(url, keyboard, proxyToUse, minTime, maxTime)
             usedDriver += 1
         }
         logI18n('logMessages.googleSearchCompleted')
@@ -1731,7 +1800,14 @@ async function executeDirectVisit(config) {
     // Proxy sadece seçilmişse kullan
     if (useProxy && proxy) {
         try {
-            options.addArguments(`--proxy-server=http://${proxy}`)
+            var normalizedProxy = normalizeProxy(proxy)
+            if (normalizedProxy) {
+                options.addArguments(`--proxy-server=${normalizedProxy}`)
+                log(`Proxy kullanılıyor: ${normalizedProxy}`)
+            } else {
+                log(`Proxy desteklenmiyor veya geçersiz: ${proxy}, proxy olmadan devam ediliyor`)
+                useProxy = false
+            }
         } catch (e) {
             log(`Proxy ayarlama hatası: ${e.message}, proxy olmadan devam ediliyor`)
             useProxy = false
@@ -1837,11 +1913,144 @@ async function start(config) {
     startScheduler()
 }
 
+// Proxy test fonksiyonu
+async function testProxies() {
+    log(`[PROXY TEST] Proxy testi başlatılıyor...`)
+    var proxyList = await loadproxy()
+    var results = {
+        total: 0,
+        valid: 0,
+        invalid: 0,
+        unsupported: 0,
+        working: [],
+        notWorking: [],
+        unsupportedList: []
+    }
+    
+    if (proxyList.length === 0) {
+        log(`[PROXY TEST] Proxy dosyası bulunamadı veya boş`)
+        return results
+    }
+    
+    results.total = proxyList.length
+    log(`[PROXY TEST] ${results.total} proxy test ediliyor...`)
+    
+    // Desteklenen proxy'leri filtrele
+    var validProxies = []
+    proxyList.forEach(p => {
+        var normalized = normalizeProxy(p)
+        if (normalized) {
+            validProxies.push(p)
+        } else {
+            results.unsupported++
+            results.unsupportedList.push(p)
+        }
+    })
+    
+    log(`[PROXY TEST] ${validProxies.length} desteklenen proxy bulundu, ${results.unsupported} desteklenmeyen (SOCKS4 vb.)`)
+    
+    // Her proxy'yi test et (ilk 20 proxy'yi test et, çok uzun sürmemesi için)
+    var testCount = Math.min(validProxies.length, 20)
+    log(`[PROXY TEST] İlk ${testCount} proxy test ediliyor...`)
+    
+    for (var i = 0; i < testCount; i++) {
+        var proxy = validProxies[i]
+        var normalizedProxy = normalizeProxy(proxy)
+        
+        log(`[PROXY TEST] ${i + 1}/${testCount} - Test ediliyor: ${normalizedProxy}`)
+        
+        var options = new chrome.Options()
+        options.addArguments(`--proxy-server=${normalizedProxy}`)
+        PERMISSIONS.forEach(perms => options.addArguments(perms))
+        options.excludeSwitches('enable-logging')
+        options.addArguments('--headless') // Test için headless kullan
+        
+        var driver = null
+        var testResult = false
+        
+        try {
+            // Timeout ile test et
+            var timeoutPromise = new Promise((resolve) => {
+                setTimeout(() => {
+                    if (driver) {
+                        driver.quit().catch(() => {}).finally(() => {
+                            testResult = false
+                            resolve()
+                        })
+                    } else {
+                        testResult = false
+                        resolve()
+                    }
+                }, 15000) // 15 saniye timeout
+            })
+            
+            var testPromise = new Promise(async (resolve) => {
+                try {
+                    driver = await new webDriver.Builder()
+                        .forBrowser('chrome')
+                        .setChromeService(chromedriver)
+                        .setChromeOptions(options)
+                        .build()
+                    
+                    // Basit bir sayfaya bağlanmayı dene
+                    await driver.get('https://www.google.com')
+                    await delay(2000) // 2 saniye bekle
+                    testResult = true
+                    
+                    if (driver) {
+                        try {
+                            await driver.quit()
+                        } catch (e) {}
+                    }
+                    resolve()
+                } catch (e) {
+                    testResult = false
+                    if (driver) {
+                        try {
+                            await driver.quit()
+                        } catch (e2) {}
+                    }
+                    resolve()
+                }
+            })
+            
+            // İlk tamamlanan promise'i bekle
+            await Promise.race([testPromise, timeoutPromise])
+            
+            if (testResult) {
+                results.valid++
+                results.working.push(proxy)
+                log(`[PROXY TEST] ✅ Çalışıyor: ${normalizedProxy}`)
+            } else {
+                results.invalid++
+                results.notWorking.push(proxy)
+                log(`[PROXY TEST] ❌ Çalışmıyor: ${normalizedProxy}`)
+            }
+        } catch (e) {
+            results.invalid++
+            results.notWorking.push(proxy)
+            log(`[PROXY TEST] ❌ Hata: ${normalizedProxy} - ${e.message}`)
+        }
+        
+        // Her test arasında kısa bekleme
+        await delay(500)
+    }
+    
+    log(`[PROXY TEST] Test tamamlandı!`)
+    log(`[PROXY TEST] Toplam: ${results.total}`)
+    log(`[PROXY TEST] Çalışan: ${results.valid}`)
+    log(`[PROXY TEST] Çalışmayan: ${results.invalid}`)
+    log(`[PROXY TEST] Desteklenmeyen: ${results.unsupported}`)
+    
+    return results
+}
+
 module.exports = { 
     main: main,
     stop: stop,
     setLogCallback: setLogCallback,
     setVisitCallback: setVisitCallback,
     checkSitemap: checkSitemap,
-    start: start
+    start: start,
+    testProxies: testProxies
 }

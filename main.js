@@ -248,6 +248,15 @@ ipcMain.handle('get-bot-status', () => {
     return { isRunning: isRunning };
 });
 
+ipcMain.handle('test-proxies', async () => {
+    try {
+        const results = await bot.testProxies();
+        return { success: true, results: results };
+    } catch (error) {
+        return { success: false, message: error.message, results: null };
+    }
+});
+
 // Uygulama hazır olduğunda pencere oluştur
 app.whenReady().then(() => {
     createMenu(); // Menüyü oluştur

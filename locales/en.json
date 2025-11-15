@@ -30,6 +30,7 @@
   },
   "buttons": {
     "checkSitemap": "Check Sitemap",
+    "testProxy": "Test Proxy",
     "start": "Start",
     "stop": "Stop",
     "clear": "Clear",
@@ -65,7 +66,15 @@
     "visitRecorded": "✅ Visit recorded: {time}",
     "visitError": "❌ Visit record error: {error}",
     "chartReset": "📊 Chart reset",
-    "invalidTimeRange": "❌ End time must be after start time!"
+    "invalidTimeRange": "❌ End time must be after start time!",
+    "proxyTestStarting": "🔍 Starting proxy test...",
+    "proxyTestCompleted": "✅ Proxy test completed!",
+    "proxyTestTotal": "Total Proxies",
+    "proxyTestWorking": "Working Proxies",
+    "proxyTestNotWorking": "Not Working Proxies",
+    "proxyTestUnsupported": "Unsupported Proxies",
+    "proxyTestWorkingList": "Working Proxy List",
+    "proxyTestError": "❌ Proxy test error: {error}"
   },
   "searchEngines": {
     "google": "Google",

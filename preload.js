@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     stopBot: () => ipcRenderer.invoke('stop-bot'),
     checkSitemap: (url) => ipcRenderer.invoke('check-sitemap', url),
     getBotStatus: () => ipcRenderer.invoke('get-bot-status'),
+    testProxies: () => ipcRenderer.invoke('test-proxies'),
     
     // Event listeners
     onLogMessage: (callback) => {
