@@ -7,7 +7,7 @@ dist/
 build/
 
 # Proxy files (may contain sensitive data)
-proxy/*.txt
+# proxy/*.txt - Commented out to allow proxy files in repository
 proxy/*.log
 
 # OS files
