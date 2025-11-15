@@ -31,6 +31,7 @@
   "buttons": {
     "checkSitemap": "Sitemap Kontrol Et",
     "testProxy": "Proxy Test Et",
+    "downloadProxy": "Proxy İndir",
     "analyzeSEO": "SEO Analizi",
     "pingBots": "Botları Tetikle",
     "start": "Başlat",
@@ -77,6 +78,9 @@
     "proxyTestUnsupported": "Desteklenmeyen Proxy",
     "proxyTestWorkingList": "Çalışan Proxy Listesi",
     "proxyTestError": "❌ Proxy test hatası: {error}",
+    "proxyDownloadStarting": "🔍 Proxy listesi indiriliyor...",
+    "proxyDownloadCompleted": "✅ {count} proxy indirildi ve kaydedildi: {fileName}",
+    "proxyDownloadError": "❌ Proxy indirme hatası: {error}",
     "rankingCheckStarting": "🔍 Sıralama kontrol ediliyor: \"{keyword}\" için {url}...",
     "rankingCheckFound": "✅ Sıralama bulundu! \"{keyword}\" - Pozisyon {position} (Sayfa {page})",
     "rankingCheckNotFound": "⚠️ Sıralama bulunamadı: \"{keyword}\" (ilk 2 sayfada)",

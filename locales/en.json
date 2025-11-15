@@ -31,6 +31,7 @@
   "buttons": {
     "checkSitemap": "Check Sitemap",
     "testProxy": "Test Proxy",
+    "downloadProxy": "Download Proxy",
     "analyzeSEO": "SEO Analysis",
     "pingBots": "Ping Search Bots",
     "start": "Start",
@@ -77,6 +78,9 @@
     "proxyTestUnsupported": "Unsupported Proxies",
     "proxyTestWorkingList": "Working Proxy List",
     "proxyTestError": "❌ Proxy test error: {error}",
+    "proxyDownloadStarting": "🔍 Downloading proxy list...",
+    "proxyDownloadCompleted": "✅ {count} proxies downloaded and saved: {fileName}",
+    "proxyDownloadError": "❌ Proxy download error: {error}",
     "rankingCheckStarting": "🔍 Checking ranking: {url} for \"{keyword}\"...",
     "rankingCheckFound": "✅ Ranking found! \"{keyword}\" - Position {position} (Page {page})",
     "rankingCheckNotFound": "⚠️ Ranking not found: \"{keyword}\" (first 2 pages)",

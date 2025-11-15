@@ -6,7 +6,7 @@
 ![Electron](https://img.shields.io/badge/Electron-Latest-9FEAF9?style=for-the-badge&logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-14.20+-green?style=for-the-badge&logo=node.js)
 ![License](https://img.shields.io/badge/License-ISC-yellow?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.2.0-green?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.3.0-green?style=for-the-badge)
 
 [![GitHub stars](https://img.shields.io/github/stars/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/network/members)
@@ -24,7 +24,13 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 
 > ⚠️ **Önemli**: Bu bot eğitim ve test amaçlıdır. Google'ın hizmet şartlarına uygun kullanın.
 
-## 🆕 Son Güncellemeler (v1.2.0)
+## 🆕 Son Güncellemeler (v1.3.0)
+
+- ✅ **📥 Otomatik Proxy İndirme**: "Proxy İndir" butonu ile güncel proxy listesini otomatik indirin
+- ✅ **🔄 Proxyscrape.com Entegrasyonu**: Ücretsiz proxy API'sinden otomatik proxy indirme
+- ✅ **📁 Tarih Damgalı Dosyalar**: İndirilen proxy'ler otomatik olarak tarih damgalı dosyalara kaydedilir
+
+### Önceki Güncellemeler (v1.2.0)
 
 - ✅ **🔑 API Ayarları Menüsü**: Menüden API key'lerinizi ekleyin (OpenAI, Anthropic, Google Gemini)
 - ✅ **AI Destekli SEO Önerileri**: API key'lerle gelişmiş AI önerileri alın
@@ -62,6 +68,7 @@ Google SEO Bot, web sitenizin Google SEO sıralamasını iyileştirmek için org
 
 ### ⚙️ Gelişmiş Özellikler
 - **🔄 Rotating Proxy Desteği**: Otomatik proxy rotasyonu ile farklı IP adreslerinden trafik gönderir
+- **📥 Otomatik Proxy İndirme**: Güncel proxy listesini tek tıkla indirin
 - **🧪 Proxy Test Özelliği**: Proxy'lerin çalışıp çalışmadığını test eder
 - **📈 Zamanlanmış Ziyaretler**: Ziyaretleri belirli zaman aralıklarında planlayabilirsiniz
 - **🕵️ Stealth Modu**: Bot tespitini önlemek için gelişmiş spoofing teknikleri
@@ -165,6 +172,12 @@ npm start
 - Detaylı SEO raporu modal'da görüntülenir
 - SEO skoru (0-100) ve tüm kriterler kontrol edilir
 - AI destekli öneriler (API key eklendiyse) veya kural tabanlı öneriler gösterilir
+
+**Proxy İndir (Yeni!):**
+- "Proxy İndir" butonuna tıklayın
+- Güncel proxy listesi otomatik olarak indirilir (Proxyscrape.com'dan)
+- İndirilen proxy'ler `proxy/` klasörüne tarih damgalı dosya olarak kaydedilir
+- Proxy'ler otomatik olarak kullanıma hazır hale gelir
 
 **Proxy Test:**
 - "Proxy Test Et" butonuna tıklayın
@@ -288,11 +301,29 @@ Uygulama arayüzünde sağ üstteki dil seçiciden istediğiniz dili seçebilirs
 
 ### Proxy Kullanımı
 
-Proxy dosyalarını `proxy/` klasörüne ekleyin. Her satırda bir proxy adresi olmalı:
+#### Otomatik Proxy İndirme (Önerilen)
+
+Uygulama içinde **"Proxy İndir"** butonunu kullanarak güncel proxy listesini otomatik olarak indirebilirsiniz:
+- Proxyscrape.com API'sinden güncel proxy'ler indirilir
+- İndirilen proxy'ler `proxy/` klasörüne tarih damgalı dosya olarak kaydedilir
+- Örnek dosya adı: `2024_12_31_proxyscrape_proxyscrape.txt`
+
+#### Manuel Proxy Ekleme
+
+Proxy dosyalarını `proxy/` klasörüne manuel olarak da ekleyebilirsiniz. Her satırda bir proxy adresi olmalı:
 ```
 123.45.67.89:8080
 98.76.54.32:3128:username:password
+http://111.222.333.444:8080
+socks5://555.666.777.888:1080
 ```
+
+#### Proxy Kaynakları
+
+Güncel proxy listelerini şu kaynaklardan temin edebilirsiniz:
+- **Proxyscrape.com**: [proxyscrape.com](https://proxyscrape.com) - Ücretsiz proxy API
+- **Free-Proxy-List.net**: [free-proxy-list.net](https://free-proxy-list.net) - Manuel indirme
+- **Proxy-List.download**: [proxy-list.download](https://www.proxy-list.download) - Çeşitli formatlar
 
 ### Chrome Ayarları
 

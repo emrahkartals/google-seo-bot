@@ -3,6 +3,8 @@ const chrome = require('selenium-webdriver/chrome')
 const chromedriver = new chrome.ServiceBuilder(require('chromedriver').path)
 const https = require('https')
 const http = require('http')
+const fs = require('fs')
+const path = require('path')
 
 const auto = require('./autobot')
 const loadproxy = require('./proxy')
@@ -2816,6 +2818,98 @@ async function checkRanking(url, keyword) {
     }
 }
 
+// Proxy listesini otomatik indir
+async function downloadProxies(source = 'proxyscrape') {
+    log(`[PROXY İNDİR] Proxy listesi indiriliyor... Kaynak: ${source}`)
+    
+    try {
+        var proxyData = ''
+        var proxyUrl = ''
+        
+        // Kaynak seçimi
+        switch(source) {
+            case 'proxyscrape':
+                // Proxyscrape.com - HTTP/HTTPS proxy'ler
+                proxyUrl = 'https://api.proxyscrape.com/v2/?request=get&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all'
+                break
+            case 'proxyscrape_socks5':
+                // Proxyscrape.com - SOCKS5 proxy'ler
+                proxyUrl = 'https://api.proxyscrape.com/v2/?request=get&protocol=socks5&timeout=10000&country=all'
+                break
+            case 'proxyscrape_all':
+                // Proxyscrape.com - Tüm proxy'ler
+                proxyUrl = 'https://api.proxyscrape.com/v2/?request=get&protocol=all&timeout=10000&country=all'
+                break
+            default:
+                proxyUrl = 'https://api.proxyscrape.com/v2/?request=get&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all'
+        }
+        
+        // Proxy listesini indir
+        proxyData = await new Promise((resolve, reject) => {
+            https.get(proxyUrl, (res) => {
+                var data = ''
+                res.on('data', (chunk) => {
+                    data += chunk
+                })
+                res.on('end', () => {
+                    resolve(data)
+                })
+            }).on('error', (err) => {
+                reject(err)
+            })
+        })
+        
+        if (!proxyData || proxyData.trim().length === 0) {
+            throw new Error('Proxy listesi boş döndü')
+        }
+        
+        // Proxy'leri parse et
+        var proxies = proxyData.split('\n').map(p => p.trim()).filter(p => p.length > 0)
+        
+        if (proxies.length === 0) {
+            throw new Error('Geçerli proxy bulunamadı')
+        }
+        
+        log(`[PROXY İNDİR] ${proxies.length} proxy indirildi`)
+        
+        // Dosyaya kaydet
+        var proxyDir = './proxy'
+        if (!fs.existsSync(proxyDir)) {
+            fs.mkdirSync(proxyDir, { recursive: true })
+        }
+        
+        // Tarih damgalı dosya adı
+        var now = new Date()
+        var dateStr = now.getFullYear() + '_' + 
+                     String(now.getMonth() + 1).padStart(2, '0') + '_' + 
+                     String(now.getDate()).padStart(2, '0')
+        var fileName = `${dateStr}_proxyscrape_${source}.txt`
+        var filePath = path.join(proxyDir, fileName)
+        
+        // Proxy'leri dosyaya yaz
+        var fileContent = proxies.join('\n')
+        fs.writeFileSync(filePath, fileContent, 'utf8')
+        
+        log(`[PROXY İNDİR] ✅ Proxy listesi kaydedildi: ${fileName} (${proxies.length} proxy)`)
+        
+        return {
+            success: true,
+            count: proxies.length,
+            fileName: fileName,
+            filePath: filePath,
+            source: source
+        }
+        
+    } catch (err) {
+        log(`[PROXY İNDİR] ❌ Hata: ${err.message}`)
+        return {
+            success: false,
+            error: err.message,
+            count: 0
+        }
+    }
+}
+
 module.exports = { 
     main: main,
     stop: stop,
@@ -2827,5 +2921,6 @@ module.exports = {
     testProxies: testProxies,
     checkRanking: checkRanking,
     analyzeSEO: analyzeSEO,
-    pingSearchEngines: pingSearchEngines
+    pingSearchEngines: pingSearchEngines,
+    downloadProxies: downloadProxies
 }

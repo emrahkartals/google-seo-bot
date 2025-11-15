@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     checkRanking: (url, keyword) => ipcRenderer.invoke('check-ranking', url, keyword),
     analyzeSEO: (url) => ipcRenderer.invoke('analyze-seo', url),
     pingSearchEngines: (url) => ipcRenderer.invoke('ping-search-engines', url),
+    downloadProxies: (source) => ipcRenderer.invoke('download-proxies', source),
     
     // Event listeners
     onLogMessage: (callback) => {

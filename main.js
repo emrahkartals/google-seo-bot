@@ -305,6 +305,15 @@ ipcMain.handle('ping-search-engines', async (event, url) => {
     }
 });
 
+ipcMain.handle('download-proxies', async (event, source) => {
+    try {
+        const result = await bot.downloadProxies(source || 'proxyscrape');
+        return { success: true, result: result };
+    } catch (error) {
+        return { success: false, message: error.message, result: null };
+    }
+});
+
 // Uygulama hazır olduğunda pencere oluştur
 app.whenReady().then(() => {
     createMenu(); // Menüyü oluştur

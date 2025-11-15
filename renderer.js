@@ -17,6 +17,7 @@ const startBtn = document.getElementById('start-btn');
 const stopBtn = document.getElementById('stop-btn');
 const checkSitemapBtn = document.getElementById('check-sitemap-btn');
 const testProxyBtn = document.getElementById('test-proxy-btn');
+const downloadProxyBtn = document.getElementById('download-proxy-btn');
 const analyzeSeoBtn = document.getElementById('analyze-seo-btn');
 const pingBotsBtn = document.getElementById('ping-bots-btn');
 const clearLogsBtn = document.getElementById('clear-logs-btn');
@@ -90,6 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     stopBtn.addEventListener('click', handleStop);
     checkSitemapBtn.addEventListener('click', handleCheckSitemap);
     testProxyBtn.addEventListener('click', handleTestProxy);
+    downloadProxyBtn.addEventListener('click', handleDownloadProxy);
     analyzeSeoBtn.addEventListener('click', handleAnalyzeSEO);
     pingBotsBtn.addEventListener('click', handlePingBots);
     clearLogsBtn.addEventListener('click', clearLogs);
@@ -485,6 +487,33 @@ async function handleTestProxy() {
         } catch (error) {
             testProxyBtn.disabled = false;
             addLog(t('messages.proxyTestError', {error: error.message}), 'error');
+        }
+    }
+}
+
+async function handleDownloadProxy() {
+    if (window.electronAPI) {
+        downloadProxyBtn.disabled = true;
+        addLog(t('messages.proxyDownloadStarting') || '🔍 Proxy listesi indiriliyor...', '');
+        
+        try {
+            // Varsayılan olarak HTTP/HTTPS proxy'leri indir
+            const result = await window.electronAPI.downloadProxies('proxyscrape');
+            downloadProxyBtn.disabled = false;
+            
+            if (result.success && result.result) {
+                const r = result.result;
+                if (r.success) {
+                    addLog(t('messages.proxyDownloadCompleted', {count: r.count, fileName: r.fileName}) || `✅ ${r.count} proxy indirildi ve kaydedildi: ${r.fileName}`, 'success');
+                } else {
+                    addLog(t('messages.proxyDownloadError', {error: r.error || 'Unknown error'}) || `❌ Proxy indirme hatası: ${r.error}`, 'error');
+                }
+            } else {
+                addLog(t('messages.proxyDownloadError', {error: result.message || 'Unknown error'}) || `❌ Proxy indirme hatası: ${result.message}`, 'error');
+            }
+        } catch (error) {
+            downloadProxyBtn.disabled = false;
+            addLog(t('messages.proxyDownloadError', {error: error.message}) || `❌ Proxy indirme hatası: ${error.message}`, 'error');
         }
     }
 }
