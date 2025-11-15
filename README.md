@@ -12,7 +12,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/emrahkartals/google-seo-bot?style=social)](https://github.com/emrahkartals/google-seo-bot/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/emrahkartals/google-seo-bot)](https://github.com/emrahkartals/google-seo-bot/issues)
 
-**Organik trafik simülasyonu ile SEO sıralamanızı yükseltin**
+**Organik simülasyon ile SEO analizinizi AI desteğiyle yapın, düzenleyin, sıralamanızı yükseltin**
 
 [Özellikler](#-özellikler) • [Kurulum](#-kurulum) • [Kullanım](#-kullanım) • [Dokümantasyon](#-dokümantasyon)
 
